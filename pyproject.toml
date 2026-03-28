@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devloop"
+version = "0.1.1"
+description = "Progressive algorithmization toolchain — from LLM to deterministic code, from proxy to tickets"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [{name = "Tom Sapletta", email = "tom@sapletta.com"}]
+keywords = [
+    "llm", "devtools", "proxy", "tickets", "progressive-algorithmization",
+    "mcp", "propact", "code-analysis", "automation", "workflow",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+dependencies = [
+    "pyyaml>=6.0",
+    "httpx>=0.27",
+    "rich>=13.0",
+    "typer>=0.12",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+all = ["proxym", "planfile", "llx", "vallm", "code2llm", "redup"]
+proxy = ["proxym"]
+tickets = ["planfile"]
+analysis = ["code2llm", "vallm", "redup"]
+routing = ["llx"]
+dev = ["pytest", "ruff", "mypy"]
+
+[project.scripts]
+devloop = "devloop.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/semcod/devloop"
+Repository = "https://github.com/semcod/devloop"
+
+[tool.setuptools.packages.find]
+where = ["src"]
