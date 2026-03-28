@@ -3,8 +3,8 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "devloop"
-version = "0.1.1"
+name = "prollama"
+version = "0.1.2"
 description = "Progressive algorithmization toolchain — from LLM to deterministic code, from proxy to tickets"
 readme = "README.md"
 license = {text = "Apache-2.0"}

@@ -1,229 +1,227 @@
-# devloop
+# Prollama
 
-**Progressive algorithmization toolchain — from LLM to deterministic code, from proxy to tickets.**
+Progressive algorithmization toolchain — from LLM to deterministic code, from proxy to tickets.
 
-> The only framework that automates the path from "LLM handles everything"
-> to "most traffic runs deterministically, LLM only for edge cases."
+## Overview
 
-```
-pip install devloop
-devloop init ./my-app
-devloop go
-```
-
-## Why "devloop"?
-
-The name reflects the core cycle: **analyze → plan → execute → validate → repeat**. Each iteration makes your codebase healthier and your LLM usage cheaper. The progressive algorithmization loop gradually replaces LLM calls with deterministic rules.
-
-## Name alternatives considered
-
-| Name | Why it works | Why we picked devloop |
-|------|-------------|----------------------|
-| **devloop** | Core concept: the continuous improvement loop | Clear, memorable, tech-neutral |
-| prollama | "progressive" + llama vibes | Ties too much to one model family |
-| codefact | Code + factory/fact | Sounds like a trivia app |
-| algopact | Algorithm + Propact | Hard to pronounce |
-| loopcode | Loop + code | Reverse reads awkward |
-| prodev | Progressive + dev | Too generic, SEO nightmare |
-
-## Three layers, one command
-
-### Layer 1: Code Quality Loop
-```python
-from devloop import Project
-
-p = Project("./my-app")
-p.analyze()    # code2llm + vallm + redup → health report
-p.plan()       # auto-generate tickets from analysis
-p.execute()    # LLM handles tasks via proxym
-p.status()     # health + tickets + budget + cost ledger
-```
-
-### Layer 2: Progressive Algorithmization
-```python
-from devloop import Loop
-
-loop = Loop("./my-app")
-loop.discover()        # Stage 1: collect all LLM traces
-loop.extract()         # Stage 2: find repeating patterns
-loop.generate_rules()  # Stage 3: AI writes its own replacement
-loop.route()           # Stage 4: rules vs LLM by confidence
-loop.optimize()        # Stage 5: monitor, minimize LLM usage
-print(loop.report())   # "42% deterministic, $12.50 saved"
-```
-
-### Layer 3: Propact Workflows
-```python
-from devloop import Workflow
-
-wf = Workflow("./refactor-v1.md")
-wf.execute()   # runs propact:shell, propact:rest, propact:llm blocks
-```
-
-## CLI
-
-```bash
-# Core loop
-devloop init ./my-app         # initialize project
-devloop analyze               # health check
-devloop plan --sprints 3      # generate sprint strategy + tickets
-devloop go                    # full pipeline
-devloop status                # dashboard
-
-# Progressive algorithmization
-devloop algo discover         # start trace collection
-devloop algo extract          # find patterns in traces
-devloop algo rules            # generate deterministic replacements
-devloop algo report           # show % deterministic vs LLM
-
-# Propact workflows
-devloop workflow run fix.md   # execute Markdown workflow
-devloop workflow validate f.md
-
-# Tickets
-devloop ticket add "Fix auth" --priority high
-devloop ticket list
-devloop ticket board
-devloop sync                  # push to GitHub/Jira
-
-# Quick queries
-devloop ask "Explain this race condition" --tier premium
-devloop tools                 # show installed tools
-```
-
-## The 5-Stage Progressive Algorithmization
-
-```
-Stage 1: Discovery     → LLM handles 100%, collect traces
-Stage 2: Extraction    → identify hot paths + repeating patterns
-Stage 3: Rules         → AI generates deterministic replacements
-Stage 4: Hybrid        → confidence-based: known patterns → rules, unknown → LLM
-Stage 5: Optimization  → most traffic deterministic, LLM for edge cases only
-```
-
-No existing framework automates this path. DSPy goes LLM→smaller LLM. devloop goes LLM→algorithm.
-
-## Propact: Markdown as Workflow
-
-```markdown
-# Fix Authentication Module
-
-Analyze current state:
-
-```propact:shell
-code2llm ./src/auth -f toon --json
-```
-
-Ask LLM for a fix plan:
-
-```propact:rest
-POST http://localhost:4000/v1/chat/completions
-{"model": "balanced", "messages": [{"role": "user", "content": "Fix auth"}]}
-```
-
-Validate the result:
-
-```propact:shell
-vallm batch ./src/auth --recursive
-```
-```
-
-## Planfile-Aware Proxy Headers
-
-Every LLM request through devloop carries context:
-
-```
-X-Planfile-Ref: my-project/current/DLP-0042
-X-Workflow-Ref: refactor-v1.md
-X-Task-Tier: complex
-X-Inject-Context: true
-```
-
-Proxym logs cost/model/latency **per ticket**. The cost ledger shows exactly what each task costs.
+Prollama is a comprehensive Python package that provides tools for:
+- **LLM Integration**: Chat with various language models (OpenAI, etc.)
+- **Proxy Management**: HTTP proxy operations and testing
+- **Ticket Management**: Create and manage tickets across different providers (GitHub, etc.)
+- **Configuration Management**: YAML-based configuration system
+- **CLI Interface**: Command-line tools for all operations
 
 ## Installation
 
 ```bash
-pip install devloop                # core
-pip install devloop[all]           # + all tools
-pip install devloop[proxy]         # + proxym
-pip install devloop[analysis]      # + code2llm, vallm, redup
-pip install devloop[tickets]       # + planfile
-pip install devloop[routing]       # + llx
+pip install prollama
 ```
 
-## Architecture
+For development with all optional dependencies:
 
-```
-src/devloop/
-├── __init__.py           # Project, Loop, Workflow, Config, Pipeline
-├── config.py             # Unified config (env + YAML)
-├── project.py            # Main Project class (expanded)
-├── cli.py                # Typer CLI (all commands)
-├── algo/                 # Progressive algorithmization
-│   ├── __init__.py       # Loop, TraceEntry, Pattern, Rule, LoopState
-│   └── loop.py           # Re-export
-├── propact/              # Markdown workflow engine
-│   ├── __init__.py       # Workflow, WorkflowStep, WorkflowResult
-│   └── workflow.py       # Re-export
-├── tools/
-│   ├── __init__.py       # Tool discovery
-│   ├── proxy.py          # proxym wrapper + planfile headers
-│   ├── analysis.py       # code2llm + vallm + redup
-│   └── tickets.py        # planfile wrapper + cost ledger
-└── workflows/
-    ├── __init__.py        # Pipeline (composable steps)
-    └── pipeline.py        # Re-export
+```bash
+pip install prollama[all]
 ```
 
-## How it connects to the ecosystem
+## Quick Start
 
-```
-┌─────────────────────────────────────────────────────┐
-│                     devloop                         │
-│            (orchestration layer)                    │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  analyze()   plan()   execute()   algo.discover()   │
-│     │          │         │            │             │
-│  code2llm   planfile   proxym      trace →          │
-│  vallm      tickets    llx         patterns →       │
-│  redup      strategy   models      rules →          │
-│                                    hybrid routing    │
-│                                                     │
-│  run_workflow("fix.md")                             │
-│     │                                               │
-│  propact:shell → subprocess                         │
-│  propact:rest  → httpx                              │
-│  propact:llm   → proxym                             │
-│  propact:mcp   → MCP tool call                      │
-│                                                     │
-└─────────────────────────────────────────────────────┘
+### 1. Initialize Configuration
+
+```bash
+prollama config llm.provider openai
+prollama config llm.api_key your_openai_api_key
+prollama config llm.model gpt-3.5-turbo
 ```
 
-## Tool Roles
+### 2. Chat with LLM
 
-| Tool | What | Install |
-|------|------|---------|
-| **proxym** | LLM gateway, 10 providers, routing, budget | `pip install proxym` |
-| **planfile** | Sprint planning, tickets, GitHub/Jira sync | `pip install planfile` |
-| **llx** | Metric-driven model selection, MCP server | `pip install llx` |
-| **code2llm** | Static analysis → .toon diagnostics | `pip install code2llm` |
-| **vallm** | 4-tier code validation | `pip install vallm` |
-| **redup** | Duplication detection | `pip install redup` |
+```bash
+prollama chat "Hello, how are you?"
+prollama chat "Explain quantum computing" --system "You are a physics expert"
+```
+
+### 3. Test Proxy
+
+```bash
+prollama config proxy.enabled true
+prollama config proxy.host localhost
+prollama config proxy.port 8080
+prollama proxy-test
+```
+
+### 4. Manage Tickets
+
+```bash
+# Configure GitHub integration
+prollama config tickets.provider github
+prollama config tickets.token your_github_token
+prollama config tickets.repo owner/repo
+
+# List tickets
+prollama ticket-list
+
+# Create a ticket
+prollama ticket-create "Bug in authentication" --description "Users cannot login with OAuth2"
+```
+
+## Python API
+
+### Core Usage
+
+```python
+from prollama import ProllamaCore, LLMInterface, ProxyManager, TicketManager
+
+# Initialize core with configuration
+core = ProllamaCore("config.yaml")
+
+# LLM Interface
+llm = LLMInterface(
+    provider="openai",
+    api_key="your_api_key",
+    model="gpt-3.5-turbo"
+)
+response = llm.simple_chat("Hello, world!")
+print(response)
+
+# Proxy Manager
+proxy_manager = ProxyManager()
+success = proxy_manager.test_proxy()
+
+# Ticket Manager
+ticket_manager = TicketManager(
+    provider="github",
+    token="your_github_token",
+    repo="owner/repo"
+)
+tickets = ticket_manager.list_tickets()
+```
+
+### Configuration
+
+Create a `prollama.yaml` file:
+
+```yaml
+llm:
+  provider: openai
+  model: gpt-3.5-turbo
+  api_key: ${OPENAI_API_KEY}
+
+proxy:
+  enabled: false
+  host: localhost
+  port: 8080
+
+tickets:
+  provider: github
+  token: ${GITHUB_TOKEN}
+  repo: owner/repo
+```
+
+## CLI Commands
+
+### Configuration
+
+```bash
+# Show all configuration
+prollama config
+
+# Get specific value
+prollama config llm.model
+
+# Set configuration value
+prollama config llm.model gpt-4
+```
+
+### LLM Chat
+
+```bash
+# Simple chat
+prollama chat "Your prompt here"
+
+# With system prompt and custom model
+prollama chat "Explain AI" --system "You are an AI expert" --model gpt-4
+```
+
+### Proxy Operations
+
+```bash
+# Test proxy connectivity
+prollama proxy-test
+
+# Configure proxy
+prollama config proxy.enabled true
+prollama config proxy.host proxy.example.com
+prollama config proxy.port 3128
+```
+
+### Ticket Management
+
+```bash
+# List open tickets
+prollama ticket-list
+
+# List closed tickets
+prollama ticket-list --status closed
+
+# Create new ticket
+prollama ticket-create "New feature request" \
+  --description "Add support for dark mode" \
+  --labels "enhancement,ui" \
+  --priority high
+```
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/semcod/devloop.git
+cd devloop
+
+# Install in development mode
+pip install -e .[dev]
+
+# Run tests
+pytest
+
+# Lint code
+ruff check .
+ruff format .
+
+# Type checking
+mypy src/
+```
+
+### Project Structure
+
+```
+src/prollama/
+├── __init__.py      # Package initialization
+├── core.py         # Core configuration and utilities
+├── llm.py          # LLM interface
+├── proxy.py        # Proxy management
+├── tickets.py      # Ticket management
+└── cli.py          # Command-line interface
+```
 
 ## License
 
 Licensed under Apache-2.0.
 
 
-Apache License 2.0
+Apache License 2.0 - see [LICENSE](LICENSE) file for details.
 
-## Author
+## Contributing
 
-Tom Sapletta
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
+## Support
 
-Created by **Tom Sapletta** — [tom@sapletta.com](mailto:tom@sapletta.com)
-
-Part of the [semcod](https://github.com/semcod) / [wronai](https://github.com/wronai) ecosystem.
+- Documentation: [GitHub Wiki](https://github.com/semcod/devloop/wiki)
+- Issues: [GitHub Issues](https://github.com/semcod/devloop/issues)
+- Discussions: [GitHub Discussions](https://github.com/semcod/devloop/discussions)
