@@ -45,7 +45,7 @@ def save_github_token(token: str, username: str | None = None) -> None:
     creds = {"github_token": token}
     if username:
         creds["github_username"] = username
-    creds_path.write_text(json.dumps(creds, indent=2), mode="w")
+    creds_path.write_text(json.dumps(creds, indent=2))
     # Restrict permissions (owner read/write only)
     os.chmod(creds_path, 0o600)
 
