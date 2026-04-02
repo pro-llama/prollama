@@ -1,21 +1,23 @@
+"""prollama — Intelligent LLM Execution Layer for developer teams.
+
+Anonymize code, route models intelligently, solve tickets autonomously.
 """
-Prollama - Progressive algorithmization toolchain
 
-From LLM to deterministic code, from proxy to tickets.
-"""
+from importlib.metadata import PackageNotFoundError, version as package_version
+from pathlib import Path
 
-__version__ = "0.1.2"
-__author__ = "Tom Sapletta"
-__email__ = "tom@sapletta.com"
 
-from .core import ProllamaCore
-from .llm import LLMInterface
-from .proxy import ProxyManager
-from .tickets import TicketManager
+def _load_version() -> str:
+    try:
+        return package_version("prollama")
+    except PackageNotFoundError:
+        version_file = Path(__file__).resolve().parents[2] / "VERSION"
+        if version_file.exists():
+            return version_file.read_text(encoding="utf-8").strip()
+        return "0.2.0"
 
-__all__ = [
-    "ProllamaCore",
-    "LLMInterface", 
-    "ProxyManager",
-    "TicketManager",
-]
+
+__version__ = _load_version()
+__all__ = ["Config", "Proxy", "TaskExecutor", "Anonymizer"]
+
+from prollama.config import Config
