@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "prollama"
-version = "0.2.4"
+version = "0.2.5"
 description = "Intelligent LLM Execution Layer for developer teams — anonymize code, route models, solve tickets."
 readme = "README.md"
 license = "Apache-2.0"

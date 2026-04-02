@@ -64,6 +64,24 @@ def main(ctx: click.Context, config_path: str | None, version: bool) -> None:
         ctx.exit(1)
 
 
+# ── login ──────────────────────────────────────────────────────────────────
+
+@main.command()
+def login() -> None:
+    """Authenticate with GitHub using OAuth device flow."""
+    from prollama.auth import login_device_flow
+    login_device_flow()
+
+
+# ── logout ─────────────────────────────────────────────────────────────────
+
+@main.command()
+def logout() -> None:
+    """Remove stored GitHub credentials."""
+    from prollama.auth import logout
+    logout()
+
+
 # ── init ───────────────────────────────────────────────────────────────────
 
 @main.command()
@@ -166,6 +184,8 @@ def status(ctx: click.Context) -> None:
 @click.option("--error", "-e", default=None, help="Error message or traceback")
 @click.option("--ticket", "-t", default=None, help="Ticket ref (e.g. github:org/repo#142)")
 @click.option("--dry-run", is_flag=True, help="Show what would happen without executing")
+@click.option("--pr", is_flag=True, help="Create Pull Request with the fix")
+@click.option("--draft-pr", is_flag=True, help="Create PR as draft")
 @click.pass_context
 def solve(
     ctx: click.Context,
@@ -174,6 +194,8 @@ def solve(
     error: str | None,
     ticket: str | None,
     dry_run: bool,
+    pr: bool,
+    draft_pr: bool,
 ) -> None:
     """Solve a coding task using LLM orchestration."""
     from prollama.executor import TaskExecutor
@@ -217,6 +239,23 @@ def solve(
         console.print(f"  Model: [cyan]{result.model_used}[/]  Cost: [dim]${result.cost_usd:.4f}[/]")
         if result.patch:
             console.print(Panel(result.patch, title="Patch", border_style="green"))
+        
+        # Create PR if requested
+        if pr or draft_pr:
+            from prollama.pr import create_pr_from_solve
+            pr_data = create_pr_from_solve(
+                task_description=description,
+                patch=result.patch,
+                cost_usd=result.cost_usd,
+                model_used=result.model_used,
+                iterations=result.iterations,
+                file_path=file_path,
+                draft=draft_pr
+            )
+            if pr_data:
+                console.print(f"\n[green]✓[/green] Pull Request created!")
+                console.print(f"  [cyan]#{pr_data['number']}[/cyan] {pr_data['title']}")
+                console.print(f"  {pr_data['html_url']}")
     else:
         console.print(f"[red]✗[/] Failed: {result.error_message}")
         console.print(f"  Iterations: {result.iterations}  Cost: ${result.cost_usd:.4f}")
