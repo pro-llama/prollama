@@ -1,22 +1,44 @@
-# code2llm/evolution | 98 func | 13f | 2026-04-01
+# code2llm/evolution | 167 func | 19f | 2026-04-02
 
-NEXT[2] (ranked by impact):
-  [1] !  SPLIT-FUNC      Config.load  CC=19  fan=13
+NEXT[7] (ranked by impact):
+  [1] !! SPLIT           src/prollama/cli.py
+      WHY: 518L, 0 classes, max CC=19
+      EFFORT: ~4h  IMPACT: 9842
+
+  [2] !  SPLIT-FUNC      anonymize  CC=19  fan=21
       WHY: CC=19 exceeds 15
-      EFFORT: ~1h  IMPACT: 247
+      EFFORT: ~1h  IMPACT: 399
 
-  [2] !  SPLIT-FUNC      ProllamaShell._cmd_solve  CC=15  fan=12
+  [3] !  SPLIT-FUNC      login_device_flow  CC=19  fan=18
+      WHY: CC=19 exceeds 15
+      EFFORT: ~1h  IMPACT: 342
+
+  [4] !  SPLIT-FUNC      Config.load  CC=21  fan=13
+      WHY: CC=21 exceeds 15
+      EFFORT: ~1h  IMPACT: 273
+
+  [5] !  SPLIT-FUNC      ProllamaShell._cmd_solve  CC=15  fan=12
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 180
 
+  [6] !  SPLIT-FUNC      ModelRouter.select  CC=18  fan=6
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 108
 
-RISKS[0]: none
+  [7] !! SPLIT           test_multilang_filtering.py
+      WHY: 757L, 0 classes, max CC=0
+      EFFORT: ~4h  IMPACT: 0
+
+
+RISKS[2]:
+  ⚠ Splitting test_multilang_filtering.py may break 0 import paths
+  ⚠ Splitting src/prollama/cli.py may break 18 import paths
 
 METRICS-TARGET:
-  CC̄:          3.6 → ≤2.5
-  max-CC:      19 → ≤9
-  god-modules: 0 → 0
-  high-CC(≥15): 2 → ≤1
+  CC̄:          3.8 → ≤2.7
+  max-CC:      21 → ≤10
+  god-modules: 2 → 0
+  high-CC(≥15): 5 → ≤2
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -44,4 +66,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=3.6 → now CC̄=3.8

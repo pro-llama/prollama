@@ -4,38 +4,57 @@
 
 - **Project**: /home/tom/github/pro-llama/prollama
 - **Primary Language**: python
-- **Languages**: python: 27, shell: 1
+- **Languages**: python: 32, shell: 3
 - **Analysis Mode**: static
-- **Total Functions**: 142
-- **Total Classes**: 45
-- **Modules**: 28
-- **Entry Points**: 132
+- **Total Functions**: 203
+- **Total Classes**: 51
+- **Modules**: 35
+- **Entry Points**: 175
 
 ## Architecture by Module
+
+### src.prollama.cli
+- **Functions**: 18
+- **File**: `cli.py`
 
 ### src.prollama.shell
 - **Functions**: 15
 - **Classes**: 1
 - **File**: `shell.py`
 
-### src.prollama.cli
-- **Functions**: 13
-- **File**: `cli.py`
+### src.prollama.anonymizer.enhanced_layer
+- **Functions**: 15
+- **Classes**: 2
+- **File**: `enhanced_layer.py`
 
-### examples.sample_code.ecommerce
+### src.prollama.security.content_filter
+- **Functions**: 13
+- **Classes**: 4
+- **File**: `content_filter.py`
+
+### src.prollama.auth
 - **Functions**: 11
-- **Classes**: 3
-- **File**: `ecommerce.py`
+- **File**: `auth.py`
 
 ### src.prollama.anonymizer.ast_layer
-- **Functions**: 9
+- **Functions**: 10
 - **Classes**: 1
 - **File**: `ast_layer.py`
+
+### src.prollama.llm
+- **Functions**: 9
+- **Classes**: 4
+- **File**: `llm.py`
 
 ### src.prollama.executor.task_executor
 - **Functions**: 9
 - **Classes**: 1
 - **File**: `task_executor.py`
+
+### src.prollama.integrations.planfile
+- **Functions**: 9
+- **Classes**: 1
+- **File**: `planfile.py`
 
 ### examples.sample_code.ml_pipeline
 - **Functions**: 8
@@ -57,66 +76,50 @@
 - **Classes**: 2
 - **File**: `fintech_app.py`
 
+### src.prollama.proxy
+- **Functions**: 7
+- **Classes**: 3
+- **File**: `proxy.py`
+
+### src.prollama.config
+- **Functions**: 7
+- **Classes**: 6
+- **File**: `config.py`
+
+### src.prollama.pr
+- **Functions**: 7
+- **File**: `pr.py`
+
 ### src.prollama.anonymizer.nlp_layer
 - **Functions**: 7
 - **Classes**: 1
 - **File**: `nlp_layer.py`
+
+### examples.workflow.autodetection_demo
+- **Functions**: 6
+- **File**: `autodetection_demo.sh`
 
 ### src.prollama.core
 - **Functions**: 6
 - **Classes**: 1
 - **File**: `core.py`
 
-### src.prollama.config
-- **Functions**: 6
-- **Classes**: 6
-- **File**: `config.py`
-
 ### examples.sample_code.healthcare_app
 - **Functions**: 5
 - **Classes**: 2
 - **File**: `healthcare_app.py`
 
-### src.prollama.proxy
-- **Functions**: 5
-- **Classes**: 2
-- **File**: `proxy.py`
-
-### src.prollama.anonymizer.regex_layer
-- **Functions**: 5
-- **Classes**: 2
-- **File**: `regex_layer.py`
-
-### src.prollama.anonymizer.pipeline
-- **Functions**: 5
-- **Classes**: 1
-- **File**: `pipeline.py`
-
-### src.prollama.router.model_router
-- **Functions**: 5
-- **Classes**: 2
-- **File**: `model_router.py`
-
-### src.prollama.llm
-- **Functions**: 5
-- **Classes**: 3
-- **File**: `llm.py`
-
-### examples.batch_scan
-- **Functions**: 2
-- **File**: `batch_scan.py`
-
-### examples.anonymize_code
-- **Functions**: 2
-- **File**: `anonymize_code.py`
-
 ## Key Entry Points
 
 Main execution flows into the system:
 
-### examples.routing_demo.demo_routing
-> Demonstrate model selection and escalation.
-- **Calls**: Config, ModelRouter, console.print, Table, table.add_column, table.add_column, table.add_column, table.add_column
+### src.prollama.cli.anonymize
+> Anonymize a source file and show results.
+- **Calls**: main.command, click.argument, click.option, click.option, click.option, src.prollama.cli._load_config, Console, None.read_text
+
+### src.prollama.cli.solve
+> Solve a coding task using LLM orchestration.
+- **Calls**: main.command, click.argument, click.option, click.option, click.option, click.option, click.option, click.option
 
 ### src.prollama.config.Config.load
 > Load config from YAML, .env, and environment variables.
@@ -124,13 +127,9 @@ Main execution flows into the system:
 Priority: env vars > .env file > config.yaml > defaults
 - **Calls**: path.exists, api_keys.items, cls, cls, os.getenv, os.getenv, int, os.getenv
 
-### src.prollama.cli.anonymize
-> Anonymize a source file and show results.
-- **Calls**: main.command, click.argument, click.option, click.option, src.prollama.cli._load_config, None.read_text, AnonymizationPipeline, pipeline.run
-
-### src.prollama.cli.solve
-> Solve a coding task using LLM orchestration.
-- **Calls**: main.command, click.argument, click.option, click.option, click.option, click.option, src.prollama.cli._load_config, Task
+### examples.routing_demo.demo_routing
+> Demonstrate model selection and escalation.
+- **Calls**: Config, ModelRouter, console.print, Table, table.add_column, table.add_column, table.add_column, table.add_column
 
 ### src.prollama.shell.ProllamaShell._cmd_solve
 > Solve a task. Usage: solve <description> [--file PATH] [--error MSG]
@@ -142,7 +141,27 @@ Priority: env vars > .env file > config.yaml > defaults
 
 ### src.prollama.executor.task_executor.TaskExecutor.solve
 > Run the full solve loop for a task.
-- **Calls**: time.monotonic, src.prollama.executor.task_executor.classify_type, self.router.select, self._build_context, self.pipeline.run, range, TaskResult, src.prollama.executor.task_executor.classify_complexity
+- **Calls**: time.monotonic, src.prollama.executor.task_executor.classify_type, self.router.select, self._build_context, range, TaskResult, src.prollama.executor.task_executor.classify_complexity, self._fail
+
+### src.prollama.cli.check
+> Check documentation health and system status.
+- **Calls**: main.command, console.print, src.prollama.auth.is_logged_in, src.prollama.integrations.planfile.is_planfile_available, src.prollama.cli._load_config, console.print, console.print, src.prollama.pr.get_current_repo
+
+### src.prollama.security.content_filter.ContentFilter.print_detections
+> Print detection results in a formatted way.
+- **Calls**: self.get_summary, self.console.print, self.console.print, self.console.print, None.items, self.console.print, None.items, self.console.print
+
+### src.prollama.config.Config.auto_add_providers
+> Auto-detect and add providers from environment variables.
+- **Calls**: api_keys.items, os.getenv, os.getenv, os.getenv, os.getenv, os.getenv, os.getenv, os.getenv
+
+### src.prollama.security.content_filter.ContentFilter._setup_patterns
+> Setup regex patterns for detecting sensitive data.
+- **Calls**: re.compile, re.compile, re.compile, re.compile, re.compile, re.compile, re.compile, re.compile
+
+### src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.print_security_report
+> Print formatted security report.
+- **Calls**: Console, self.get_security_report, Table, table.add_column, table.add_column, table.add_row, table.add_row, table.add_row
 
 ### src.prollama.cli.start
 > Start the prollama proxy server.
@@ -151,6 +170,18 @@ Priority: env vars > .env file > config.yaml > defaults
 ### src.prollama.shell.ProllamaShell._cmd_anonymize
 > Anonymize a file. Usage: anonymize <file>
 - **Calls**: Path, file_path.read_text, AnonymizationPipeline, pipeline.run, self.console.print, self.console.print, self.console.print, file_path.exists
+
+### src.prollama.security.content_filter.ContentFilter.filter_content
+> Filter content for sensitive data using regex patterns.
+
+Args:
+    content: Content to filter
+    include_high_entropy: Whether to include high-entrop
+- **Calls**: self.patterns.items, self._deduplicate_results, results.sort, pattern.finditer, self.detect_high_entropy_strings, results.extend, self._get_context, DetectionResult
+
+### src.prollama.cli.ticket
+> Create GitHub issue via planfile integration.
+- **Calls**: main.command, click.argument, click.option, click.option, click.option, src.prollama.integrations.planfile.create_prollama_ticket, src.prollama.integrations.planfile.is_planfile_available, console.print
 
 ### src.prollama.shell.ProllamaShell._cmd_history
 > Show task history for this session.
@@ -166,6 +197,17 @@ Returns (anonymized_code, mappings_for_rehydration).
 > List available models across all providers.
 - **Calls**: ModelRouter, router.available_models, Table, table.add_column, table.add_column, table.add_column, table.add_column, table.add_column
 
+### src.prollama.security.content_filter.ContentFilter.detect_high_entropy_strings
+> Detect high-entropy strings that might be secrets.
+
+Args:
+    text: Text to analyze
+    min_length: Minimum string length to consider
+    
+Returns:
+  
+- **Calls**: re.findall, self._is_common_non_secret, self.calculate_entropy, text.find, min, results.append, str, min
+
 ### src.prollama.anonymizer.ast_layer.ASTAnonymizer._walk_tree
 > Recursively walk AST and collect identifier replacements.
 - **Calls**: LANGUAGE_TARGETS.get, LANGUAGE_BUILTINS.get, None.decode, self._is_import_context, self._is_decorator_context, self._get_replacement, replacements.append, self._walk_tree
@@ -174,9 +216,17 @@ Returns (anonymized_code, mappings_for_rehydration).
 > Send a completion request to the model's provider. Returns (response, cost).
 - **Calls**: self.config.get_provider, self._default_base_url, provider.resolve_api_key, self._http.post, resp.raise_for_status, resp.json, None.get, None.get
 
+### src.prollama.cli.sync
+> Sync/regenerate documentation and configuration.
+- **Calls**: main.command, click.option, console.print, src.prollama.cli._load_config, console.print, console.print, console.print, console.print
+
 ### src.prollama.shell.ProllamaShell._cmd_providers
 > List configured providers.
 - **Calls**: Table, table.add_column, table.add_column, table.add_column, table.add_column, self.console.print, self.console.print, self.console.print
+
+### src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._walk_tree
+> Walk AST tree and collect identifier replacements.
+- **Calls**: LANGUAGE_TARGETS.get, LANGUAGE_BUILTINS.get, set, None.decode, replacements.append, self._walk_tree, len, text.isupper
 
 ### src.prollama.tickets.TicketManager._github_list_tickets
 > List GitHub issues
@@ -190,78 +240,36 @@ Returns (anonymized_code, mappings_for_rehydration).
 > Initialize prollama configuration.
 - **Calls**: main.command, click.option, Path, config_path.exists, Config.write_template, console.print, console.print, console.print
 
-### src.prollama.tickets.TicketManager._github_create_ticket
-> Create GitHub issue
-- **Calls**: ValueError, self.client.post, response.raise_for_status, response.json, Ticket, console.print, result.get, None.get
+### src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._apply_ast_anonymization
+> Apply AST-based identifier anonymization.
+- **Calls**: tree_sitter.Parser, self._get_language, code.encode, parser.parse, self._walk_tree, None.decode, EnhancedAnonymizationMapping, self.mappings.append
 
-### examples.anonymize_code.main
-- **Calls**: examples.anonymize_code.anonymize_and_compare, len, default.exists, sys.argv.index, str, console.print, sys.exit, len
-
-### src.prollama.shell.ProllamaShell._cmd_status
-> Show current session status.
-- **Calls**: self.console.print, self.console.print, self.console.print, self.console.print, self.console.print, self.console.print, len, None.join
-
-### src.prollama.anonymizer.nlp_layer.NLPAnonymizer._anonymize_presidio
-> Use Presidio for PII detection.
-- **Calls**: AnalyzerEngine, analyzer.analyze, sorted, self._next_token, mappings.append, AnonymizationMapping, result.find, result.find
-
-### src.prollama.anonymizer.pipeline.AnonymizationPipeline.run
-> Run anonymization pipeline and return result with mappings.
-- **Calls**: self._regex.anonymize, all_mappings.extend, AnonymizationResult, AnonymizationResult, self._run_nlp, all_mappings.extend, self._run_ast, all_mappings.extend
-
-### examples.sample_code.api_secrets.WebhookHandler.process_payment_event
-> Process Stripe payment webhook event.
-- **Calls**: None.get, None.get, None.isoformat, None.get, None.get, datetime.utcnow, event.get, event.get
-
-### src.prollama.cli.main
-> prollama — Intelligent LLM Execution Layer for developer teams.
-- **Calls**: click.group, click.option, click.option, ctx.ensure_object, console.print, ctx.exit, src.prollama.cli._print_banner, console.print
-
-### src.prollama.core.ProllamaCore.load_config
-> Load configuration from YAML file
-- **Calls**: Path, config_file.exists, console.print, self.get_default_config, console.print, open, console.print, yaml.safe_load
-
-### src.prollama.anonymizer.regex_layer.RegexAnonymizer.anonymize
-> Return (anonymized_code, mappings).
-
-Mappings can later be used for rehydration (restoring originals).
-- **Calls**: pattern.regex.finditer, match.group, self._next_token, mappings.append, result.replace, original.startswith, original.endswith, AnonymizationMapping
-
-### src.prollama.llm.LLMInterface._openai_chat
-> OpenAI chat completion
-- **Calls**: ValueError, self.client.post, response.raise_for_status, response.json, LLMResponse, msg.model_dump, console.print, result.get
-
-### examples.sample_code.ecommerce.PaymentGateway.process_payment
-> Process payment through selected gateway.
-- **Calls**: self._generate_transaction_id, ValueError, float, float, float, None.isoformat, datetime.utcnow
-
-### src.prollama.shell.ProllamaShell.run
-> Start the interactive shell.
-- **Calls**: self._print_welcome, None.strip, self._dispatch, self.console.print, self._cmd_exit, self.session.prompt, HTML
+### src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.get_security_report
+> Generate comprehensive security report.
+- **Calls**: self._calculate_risk_score, len, len, len, self._generate_recommendations, any, len, len
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: demo_routing
+### Flow 1: anonymize
 ```
-demo_routing [examples.routing_demo]
+anonymize [src.prollama.cli]
 ```
 
-### Flow 2: load
+### Flow 2: solve
+```
+solve [src.prollama.cli]
+```
+
+### Flow 3: load
 ```
 load [src.prollama.config.Config]
 ```
 
-### Flow 3: anonymize
+### Flow 4: demo_routing
 ```
-anonymize [src.prollama.cli]
-  └─> _load_config
-```
-
-### Flow 4: solve
-```
-solve [src.prollama.cli]
+demo_routing [examples.routing_demo]
 ```
 
 ### Flow 5: _cmd_solve
@@ -278,25 +286,29 @@ status [src.prollama.cli]
   └─> _print_banner
 ```
 
-### Flow 7: start
+### Flow 7: check
 ```
-start [src.prollama.cli]
+check [src.prollama.cli]
   └─> _load_config
+  └─ →> is_logged_in
+      └─> load_github_token
+          └─> get_credentials_path
+  └─ →> is_planfile_available
 ```
 
-### Flow 8: _cmd_anonymize
+### Flow 8: print_detections
 ```
-_cmd_anonymize [src.prollama.shell.ProllamaShell]
-```
-
-### Flow 9: _cmd_history
-```
-_cmd_history [src.prollama.shell.ProllamaShell]
+print_detections [src.prollama.security.content_filter.ContentFilter]
 ```
 
-### Flow 10: _cmd_models
+### Flow 9: auto_add_providers
 ```
-_cmd_models [src.prollama.shell.ProllamaShell]
+auto_add_providers [src.prollama.config.Config]
+```
+
+### Flow 10: _setup_patterns
+```
+_setup_patterns [src.prollama.security.content_filter.ContentFilter]
 ```
 
 ## Key Classes
@@ -306,17 +318,40 @@ _cmd_models [src.prollama.shell.ProllamaShell]
 - **Methods**: 15
 - **Key Methods**: src.prollama.shell.ProllamaShell.__init__, src.prollama.shell.ProllamaShell.run, src.prollama.shell.ProllamaShell._dispatch, src.prollama.shell.ProllamaShell._cmd_solve, src.prollama.shell.ProllamaShell._cmd_anonymize, src.prollama.shell.ProllamaShell._cmd_status, src.prollama.shell.ProllamaShell._cmd_providers, src.prollama.shell.ProllamaShell._cmd_models, src.prollama.shell.ProllamaShell._cmd_config, src.prollama.shell.ProllamaShell._cmd_history
 
+### src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer
+> Enhanced anonymizer combining AST analysis with content filtering.
+- **Methods**: 14
+- **Key Methods**: src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.__init__, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.anonymize, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._apply_content_filtering, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._apply_ast_anonymization, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._apply_fallback_anonymization, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._get_language, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._get_language_library, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._walk_tree, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._apply_replacements, src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer._get_replacement
+
+### src.prollama.security.content_filter.ContentFilter
+> Content filtering system similar to Tabnine Shield.
+- **Methods**: 13
+- **Key Methods**: src.prollama.security.content_filter.ContentFilter.__init__, src.prollama.security.content_filter.ContentFilter._setup_patterns, src.prollama.security.content_filter.ContentFilter._setup_entropy_thresholds, src.prollama.security.content_filter.ContentFilter.calculate_entropy, src.prollama.security.content_filter.ContentFilter.detect_high_entropy_strings, src.prollama.security.content_filter.ContentFilter._is_common_non_secret, src.prollama.security.content_filter.ContentFilter._get_context, src.prollama.security.content_filter.ContentFilter.filter_content, src.prollama.security.content_filter.ContentFilter._deduplicate_results, src.prollama.security.content_filter.ContentFilter.sanitize_content
+
 ### src.prollama.anonymizer.ast_layer.ASTAnonymizer
 > Anonymize identifiers in source code using tree-sitter AST parsing.
 
 Replaces class names, function 
-- **Methods**: 9
-- **Key Methods**: src.prollama.anonymizer.ast_layer.ASTAnonymizer.anonymize, src.prollama.anonymizer.ast_layer.ASTAnonymizer.rehydrate, src.prollama.anonymizer.ast_layer.ASTAnonymizer.reset, src.prollama.anonymizer.ast_layer.ASTAnonymizer._get_language, src.prollama.anonymizer.ast_layer.ASTAnonymizer._walk_tree, src.prollama.anonymizer.ast_layer.ASTAnonymizer._is_import_context, src.prollama.anonymizer.ast_layer.ASTAnonymizer._is_decorator_context, src.prollama.anonymizer.ast_layer.ASTAnonymizer._get_replacement, src.prollama.anonymizer.ast_layer.ASTAnonymizer._classify_identifier
+- **Methods**: 10
+- **Key Methods**: src.prollama.anonymizer.ast_layer.ASTAnonymizer.anonymize, src.prollama.anonymizer.ast_layer.ASTAnonymizer.rehydrate, src.prollama.anonymizer.ast_layer.ASTAnonymizer.reset, src.prollama.anonymizer.ast_layer.ASTAnonymizer.detect_secrets, src.prollama.anonymizer.ast_layer.ASTAnonymizer._get_language, src.prollama.anonymizer.ast_layer.ASTAnonymizer._walk_tree, src.prollama.anonymizer.ast_layer.ASTAnonymizer._is_import_context, src.prollama.anonymizer.ast_layer.ASTAnonymizer._is_decorator_context, src.prollama.anonymizer.ast_layer.ASTAnonymizer._get_replacement, src.prollama.anonymizer.ast_layer.ASTAnonymizer._classify_identifier
+
+### src.prollama.integrations.planfile.PlanfileAdapter
+> Adapter for planfile integration in prollama.
+
+Provides GitHub issue/ticket management using planfil
+- **Methods**: 8
+- **Key Methods**: src.prollama.integrations.planfile.PlanfileAdapter.__init__, src.prollama.integrations.planfile.PlanfileAdapter._detect_repo, src.prollama.integrations.planfile.PlanfileAdapter._load_token, src.prollama.integrations.planfile.PlanfileAdapter.backend, src.prollama.integrations.planfile.PlanfileAdapter.create_ticket, src.prollama.integrations.planfile.PlanfileAdapter.list_tickets, src.prollama.integrations.planfile.PlanfileAdapter.update_ticket, src.prollama.integrations.planfile.PlanfileAdapter.get_ticket
 
 ### src.prollama.tickets.TicketManager
 > Manager for ticket operations across different providers
 - **Methods**: 8
 - **Key Methods**: src.prollama.tickets.TicketManager.__init__, src.prollama.tickets.TicketManager.create_ticket, src.prollama.tickets.TicketManager._github_create_ticket, src.prollama.tickets.TicketManager.list_tickets, src.prollama.tickets.TicketManager._github_list_tickets, src.prollama.tickets.TicketManager.update_ticket, src.prollama.tickets.TicketManager._github_update_ticket, src.prollama.tickets.TicketManager.close
+
+### src.prollama.config.Config
+> Root configuration for prollama.
+- **Methods**: 7
+- **Key Methods**: src.prollama.config.Config.load, src.prollama.config.Config.save, src.prollama.config.Config.write_template, src.prollama.config.Config.proxy_url, src.prollama.config.Config.get_provider, src.prollama.config.Config.provider_names, src.prollama.config.Config.auto_add_providers
+- **Inherits**: BaseModel
 
 ### src.prollama.anonymizer.nlp_layer.NLPAnonymizer
 > Detect and anonymize PII in code comments and string literals.
@@ -335,12 +370,6 @@ Uses Presidio if available, otherwis
 - **Methods**: 6
 - **Key Methods**: src.prollama.core.ProllamaCore.__init__, src.prollama.core.ProllamaCore.load_config, src.prollama.core.ProllamaCore.get_default_config, src.prollama.core.ProllamaCore.save_config, src.prollama.core.ProllamaCore.get_config_value, src.prollama.core.ProllamaCore.set_config_value
 
-### src.prollama.config.Config
-> Root configuration for prollama.
-- **Methods**: 6
-- **Key Methods**: src.prollama.config.Config.load, src.prollama.config.Config.save, src.prollama.config.Config.write_template, src.prollama.config.Config.proxy_url, src.prollama.config.Config.get_provider, src.prollama.config.Config.provider_names
-- **Inherits**: BaseModel
-
 ### examples.sample_code.ml_pipeline.MLModelManager
 > Manages ML model lifecycle including training and deployment.
 
@@ -356,6 +385,11 @@ Last s
 - **Methods**: 5
 - **Key Methods**: examples.sample_code.api_secrets.APIClientManager.__init__, examples.sample_code.api_secrets.APIClientManager.generate_jwt_token, examples.sample_code.api_secrets.APIClientManager.verify_jwt_token, examples.sample_code.api_secrets.APIClientManager.rotate_api_key, examples.sample_code.api_secrets.APIClientManager.connect_to_mongodb
 
+### src.prollama.llm.LLMInterface
+> Interface for interacting with LLM providers
+- **Methods**: 5
+- **Key Methods**: src.prollama.llm.LLMInterface.__init__, src.prollama.llm.LLMInterface.chat, src.prollama.llm.LLMInterface._openai_chat, src.prollama.llm.LLMInterface.simple_chat, src.prollama.llm.LLMInterface.close
+
 ### src.prollama.anonymizer.regex_layer.RegexAnonymizer
 > Apply regex-based anonymization to source code text.
 - **Methods**: 5
@@ -365,11 +399,6 @@ Last s
 > Orchestrate the anonymization layers according to privacy level.
 - **Methods**: 5
 - **Key Methods**: src.prollama.anonymizer.pipeline.AnonymizationPipeline.__init__, src.prollama.anonymizer.pipeline.AnonymizationPipeline.run, src.prollama.anonymizer.pipeline.AnonymizationPipeline.rehydrate, src.prollama.anonymizer.pipeline.AnonymizationPipeline._run_nlp, src.prollama.anonymizer.pipeline.AnonymizationPipeline._run_ast
-
-### src.prollama.llm.LLMInterface
-> Interface for interacting with LLM providers
-- **Methods**: 5
-- **Key Methods**: src.prollama.llm.LLMInterface.__init__, src.prollama.llm.LLMInterface.chat, src.prollama.llm.LLMInterface._openai_chat, src.prollama.llm.LLMInterface.simple_chat, src.prollama.llm.LLMInterface.close
 
 ### examples.sample_code.fintech_app.AcmePaymentProcessor
 > Handles all payment processing for Acme Fintech premium customers.
@@ -385,18 +414,10 @@ Created by: James Wilson (Lead Devel
 - **Methods**: 4
 - **Key Methods**: examples.sample_code.healthcare_app.PatientRecordService.__init__, examples.sample_code.healthcare_app.PatientRecordService.get_patient_record, examples.sample_code.healthcare_app.PatientRecordService.update_diagnosis, examples.sample_code.healthcare_app.PatientRecordService._log_access
 
-### examples.sample_code.ecommerce.PaymentGateway
-> Unified payment gateway supporting multiple providers.
-
-Manager: Jennifer Lee (Payments Team)
-Suppor
+### src.prollama.llm.LLMClient
+> Client for interacting with LLM providers (matches test API).
 - **Methods**: 4
-- **Key Methods**: examples.sample_code.ecommerce.PaymentGateway.__init__, examples.sample_code.ecommerce.PaymentGateway.process_payment, examples.sample_code.ecommerce.PaymentGateway._generate_transaction_id, examples.sample_code.ecommerce.PaymentGateway.refund_payment
-
-### examples.sample_code.ecommerce.NotificationService
-> Handles customer notifications via multiple channels.
-- **Methods**: 4
-- **Key Methods**: examples.sample_code.ecommerce.NotificationService.__init__, examples.sample_code.ecommerce.NotificationService.send_order_confirmation, examples.sample_code.ecommerce.NotificationService.send_sms_notification, examples.sample_code.ecommerce.NotificationService.notify_slack
+- **Key Methods**: src.prollama.llm.LLMClient.__init__, src.prollama.llm.LLMClient.resolve_api_key, src.prollama.llm.LLMClient.complete, src.prollama.llm.LLMClient.list_models
 
 ### src.prollama.router.model_router.ModelRouter
 > Select and escalate models based on task complexity and strategy.
@@ -410,72 +431,65 @@ Owner: Maria Garcia (Product Lead)
 - **Methods**: 3
 - **Key Methods**: examples.sample_code.fintech_app.AcmeSubscriptionManager.__init__, examples.sample_code.fintech_app.AcmeSubscriptionManager.upgrade_to_premium, examples.sample_code.fintech_app.AcmeSubscriptionManager.calculate_mrr
 
-### examples.sample_code.ml_pipeline.InferenceService
-> Real-time inference service for deployed models.
-- **Methods**: 3
-- **Key Methods**: examples.sample_code.ml_pipeline.InferenceService.__init__, examples.sample_code.ml_pipeline.InferenceService.predict, examples.sample_code.ml_pipeline.InferenceService.batch_predict
-
-### examples.sample_code.ecommerce.ShippingManager
-> Manages shipping calculations and label generation.
-- **Methods**: 3
-- **Key Methods**: examples.sample_code.ecommerce.ShippingManager.__init__, examples.sample_code.ecommerce.ShippingManager.calculate_shipping, examples.sample_code.ecommerce.ShippingManager.generate_label
-
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### examples.sample_code.ecommerce.PaymentGateway.process_payment
-> Process payment through selected gateway.
-- **Output to**: self._generate_transaction_id, ValueError, float, float, float
-
 ### examples.sample_code.api_secrets.WebhookHandler.process_payment_event
 > Process Stripe payment webhook event.
 - **Output to**: None.get, None.get, None.isoformat, None.get, None.get
+
+## Behavioral Patterns
+
+### recursion_logout
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: src.prollama.cli.logout
 
 ## Public API Surface
 
 Functions exposed as public API (no underscore prefix):
 
 - `src.prollama.proxy.create_app` - 62 calls
+- `src.prollama.cli.anonymize` - 59 calls
+- `src.prollama.auth.login_device_flow` - 50 calls
 - `examples.batch_scan.scan_project` - 40 calls
+- `src.prollama.cli.solve` - 37 calls
+- `src.prollama.config.Config.load` - 34 calls
 - `examples.routing_demo.demo_routing` - 32 calls
-- `src.prollama.config.Config.load` - 32 calls
-- `src.prollama.cli.anonymize` - 29 calls
-- `src.prollama.cli.solve` - 26 calls
 - `examples.anonymize_code.anonymize_and_compare` - 24 calls
+- `src.prollama.pr.create_pr_from_solve` - 21 calls
 - `src.prollama.cli.status` - 20 calls
-- `src.prollama.executor.task_executor.TaskExecutor.solve` - 18 calls
+- `src.prollama.executor.task_executor.TaskExecutor.solve` - 20 calls
+- `src.prollama.cli.check` - 19 calls
+- `src.prollama.security.content_filter.ContentFilter.print_detections` - 17 calls
+- `src.prollama.config.Config.auto_add_providers` - 16 calls
+- `src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.print_security_report` - 16 calls
 - `src.prollama.cli.start` - 15 calls
+- `src.prollama.security.content_filter.ContentFilter.filter_content` - 15 calls
+- `src.prollama.cli.ticket` - 14 calls
+- `src.prollama.pr.create_pull_request` - 14 calls
 - `src.prollama.anonymizer.ast_layer.ASTAnonymizer.anonymize` - 14 calls
+- `src.prollama.security.content_filter.ContentFilter.detect_high_entropy_strings` - 13 calls
+- `src.prollama.cli.sync` - 12 calls
+- `src.prollama.pr.get_current_repo` - 12 calls
+- `src.prollama.auth.get_local_username` - 11 calls
 - `src.prollama.cli.init` - 10 calls
+- `src.prollama.anonymizer.enhanced_layer.EnhancedAnonymizer.get_security_report` - 10 calls
 - `examples.anonymize_code.main` - 9 calls
+- `src.prollama.cli.main` - 9 calls
 - `src.prollama.anonymizer.pipeline.AnonymizationPipeline.run` - 9 calls
+- `src.prollama.router.model_router.ModelRouter.select` - 9 calls
 - `examples.sample_code.api_secrets.WebhookHandler.process_payment_event` - 8 calls
-- `src.prollama.cli.main` - 8 calls
 - `src.prollama.core.ProllamaCore.load_config` - 8 calls
 - `src.prollama.anonymizer.regex_layer.RegexAnonymizer.anonymize` - 8 calls
-- `examples.sample_code.ecommerce.PaymentGateway.process_payment` - 7 calls
+- `src.prollama.integrations.planfile.PlanfileAdapter.create_ticket` - 8 calls
 - `src.prollama.shell.ProllamaShell.run` - 7 calls
-- `src.prollama.router.model_router.ModelRouter.select` - 7 calls
+- `src.prollama.anonymizer.ast_layer.ASTAnonymizer.detect_secrets` - 7 calls
+- `src.prollama.router.model_router.ModelRouter.escalate` - 6 calls
 - `examples.sample_code.ml_pipeline.MLModelManager.get_feature_vector` - 5 calls
-- `src.prollama.cli.config_show` - 5 calls
-- `src.prollama.anonymizer.pipeline.AnonymizationPipeline.rehydrate` - 5 calls
-- `src.prollama.executor.task_executor.classify_complexity` - 5 calls
-- `src.prollama.executor.task_executor.classify_type` - 5 calls
-- `src.prollama.llm.LLMInterface.simple_chat` - 5 calls
-- `examples.batch_scan.main` - 4 calls
-- `examples.sample_code.fintech_app.AcmePaymentProcessor.charge_premium_customer` - 4 calls
-- `examples.sample_code.api_secrets.APIClientManager.generate_jwt_token` - 4 calls
-- `examples.sample_code.api_secrets.WebhookHandler.verify_stripe_signature` - 4 calls
-- `src.prollama.cli.shell` - 4 calls
-- `src.prollama.core.ProllamaCore.save_config` - 4 calls
-- `src.prollama.config.Config.save` - 4 calls
-- `examples.sample_code.fintech_app.AcmeSubscriptionManager.calculate_mrr` - 3 calls
-- `examples.sample_code.ml_pipeline.MLModelManager.log_experiment` - 3 calls
-- `examples.sample_code.ecommerce.ShippingManager.calculate_shipping` - 3 calls
-- `src.prollama.cli.config_path` - 3 calls
-- `src.prollama.anonymizer.ast_layer.ASTAnonymizer.rehydrate` - 3 calls
-- `src.prollama.anonymizer.ast_layer.ASTAnonymizer.reset` - 3 calls
+- `src.prollama.auth.load_github_token` - 5 calls
+- `src.prollama.auth.logout` - 5 calls
 
 ## System Interactions
 
@@ -483,22 +497,21 @@ How components interact:
 
 ```mermaid
 graph TD
+    anonymize --> command
+    anonymize --> argument
+    anonymize --> option
+    solve --> command
+    solve --> argument
+    solve --> option
+    load --> exists
+    load --> items
+    load --> cls
+    load --> getenv
     demo_routing --> Config
     demo_routing --> ModelRouter
     demo_routing --> print
     demo_routing --> Table
     demo_routing --> add_column
-    load --> exists
-    load --> items
-    load --> cls
-    load --> getenv
-    anonymize --> command
-    anonymize --> argument
-    anonymize --> option
-    anonymize --> _load_config
-    solve --> command
-    solve --> argument
-    solve --> option
     _cmd_solve --> join
     _cmd_solve --> Task
     _cmd_solve --> classify_complexity
@@ -513,6 +526,7 @@ graph TD
     solve --> classify_type
     solve --> select
     solve --> _build_context
+    solve --> range
 ```
 
 ## Reverse Engineering Guidelines

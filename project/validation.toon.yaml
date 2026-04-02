@@ -1,18 +1,36 @@
-# vallm batch | 73f | 40✓ 2⚠ 4✗ | 2026-04-01
+# vallm batch | 89f | 51✓ 6⚠ 5✗ | 2026-04-02
 
 SUMMARY:
-  scanned: 73  passed: 40 (54.8%)  warnings: 2  errors: 4  unsupported: 29
+  scanned: 89  passed: 51 (57.3%)  warnings: 6  errors: 5  unsupported: 33
 
-WARNINGS[2]{path,score}:
+WARNINGS[6]{path,score}:
+  src/prollama/auth.py,0.93
+    issues[3]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,login_device_flow has cyclomatic complexity 19 (max: 15),144
+      complexity.lizard_cc,warning,login_device_flow: CC=17 exceeds limit 15,144
+      complexity.lizard_length,warning,login_device_flow: 107 lines exceeds limit 100,144
+  src/prollama/cli.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,anonymize has cyclomatic complexity 19 (max: 15),332
+      complexity.lizard_cc,warning,anonymize: CC=17 exceeds limit 15,332
   src/prollama/config.py,0.97
     issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,load has cyclomatic complexity 19 (max: 15),129
-      complexity.lizard_cc,warning,load: CC=19 exceeds limit 15,129
-  src/prollama/proxy.py,0.97
-    issues[1]{rule,severity,message,line}:
-      complexity.lizard_cc,warning,create_app.chat_completions: CC=18 exceeds limit 15,146
+      complexity.cyclomatic,warning,load has cyclomatic complexity 21 (max: 15),132
+      complexity.lizard_cc,warning,load: CC=21 exceeds limit 15,132
+  src/prollama/router/model_router.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,select has cyclomatic complexity 18 (max: 15),87
+      complexity.lizard_cc,warning,select: CC=18 exceeds limit 15,87
+  test_comparison_safe.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,compare_tools has cyclomatic complexity 22 (max: 15),109
+      complexity.lizard_cc,warning,compare_tools: CC=22 exceeds limit 15,109
+  test_real_projects.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,test_sample_projects has cyclomatic complexity 17 (max: 15),59
+      complexity.lizard_cc,warning,test_sample_projects: CC=17 exceeds limit 15,59
 
-ERRORS[4]{path,score}:
+ERRORS[5]{path,score}:
   examples/sample_code/fintech_app.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'stripe' not found,8
@@ -24,13 +42,18 @@ ERRORS[4]{path,score}:
   src/prollama/anonymizer/nlp_layer.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'presidio_analyzer' not found,117
-  examples/sample_code/api_secrets.py,0.91
+  test_secrets_sample_safe.py,0.89
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'jwt' not found,7
+      python.import.resolvable,error,Module 'psycopg2' not found,54
+  src/prollama/proxy.py,0.90
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,94
+      python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,95
+      python.import.resolvable,error,Module 'fastapi.responses' not found,96
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,19
+  *.md,21
   Dockerfile*,1
-  *.txt,1
+  *.txt,2
   *.yml,1
-  other,7
+  other,8

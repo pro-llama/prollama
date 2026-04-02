@@ -1,14 +1,18 @@
-# code2llm | 20f 2889L | python:19,shell:1 | 2026-04-01
-# CC̄=3.6 | critical:2/142 | dups:0 | cycles:0
+# code2llm | 26f 5114L | python:25,shell:1 | 2026-04-02
+# CC̄=3.8 | critical:5/203 | dups:0 | cycles:1
 
-HEALTH[2]:
+HEALTH[5]:
+  🟡 CC    login_device_flow CC=19 (limit:15)
+  🟡 CC    anonymize CC=19 (limit:15)
+  🟡 CC    load CC=21 (limit:15)
   🟡 CC    _cmd_solve CC=15 (limit:15)
-  🟡 CC    load CC=19 (limit:15)
+  🟡 CC    select CC=18 (limit:15)
 
-REFACTOR[1]:
-  1. split 2 high-CC methods  (CC>15)
+REFACTOR[2]:
+  1. split 5 high-CC methods  (CC>15)
+  2. break 1 circular dependencies
 
-PIPELINES[110]:
+PIPELINES[153]:
   [1] Src [main]: main → scan_project
       PURITY: 100% pure
   [2] Src [__init__]: __init__
@@ -21,23 +25,29 @@ PIPELINES[110]:
       PURITY: 100% pure
 
 LAYERS:
-  src/                            CC̄=3.6    ←in:0  →out:0
+  src/                            CC̄=3.8    ←in:0  →out:0
+  │ !! cli                        518L  0C   18m  CC=19     ←0
+  │ content_filter             476L  4C   13m  CC=11     ←0
+  │ enhanced_layer             411L  2C   15m  CC=11     ←0
+  │ ast_layer                  380L  1C   10m  CC=11     ←0
   │ !! shell                      368L  1C   15m  CC=15     ←0
-  │ ast_layer                  353L  1C    9m  CC=11     ←0
-  │ proxy                      305L  2C    5m  CC=6      ←1
-  │ cli                        301L  0C   13m  CC=9      ←0
-  │ task_executor              261L  1C    9m  CC=11     ←2
-  │ !! config                     233L  6C    6m  CC=19     ←1
+  │ !! auth                       351L  0C   11m  CC=19     ←3
+  │ proxy                      319L  3C    7m  CC=6      ←1
+  │ pr                         303L  0C    7m  CC=11     ←2
+  │ !! config                     281L  6C    7m  CC=21     ←1
+  │ task_executor              271L  1C    9m  CC=14     ←2
+  │ planfile                   254L  1C    9m  CC=8      ←1
   │ nlp_layer                  187L  1C    7m  CC=5      ←0
   │ tickets                    183L  3C    8m  CC=9      ←0
-  │ model_router               129L  2C    5m  CC=13     ←0
+  │ !! model_router               152L  2C    5m  CC=18     ←0
+  │ llm                        139L  4C    9m  CC=5      ←0
   │ regex_layer                114L  2C    5m  CC=5      ←0
   │ models                     107L  10C    0m  CC=0.0    ←0
   │ pipeline                    99L  1C    5m  CC=7      ←0
-  │ llm                         90L  3C    5m  CC=4      ←0
   │ core                        84L  1C    6m  CC=4      ←0
+  │ __init__                    27L  0C    1m  CC=3      ←0
+  │ __init__                    24L  0C    0m  CC=0.0    ←0
   │ __init__                    14L  0C    0m  CC=0.0    ←0
-  │ __init__                     9L  0C    0m  CC=0.0    ←0
   │ __main__                     6L  0C    0m  CC=0.0    ←0
   │ __init__                     5L  0C    0m  CC=0.0    ←0
   │ __init__                     5L  0C    0m  CC=0.0    ←0

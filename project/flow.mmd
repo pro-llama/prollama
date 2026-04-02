@@ -6,20 +6,20 @@ flowchart TD
     subgraph Core
         src__prollama__proxy__MetricsCollector__record["record"]
         src__prollama__proxy__MetricsCollector__summary["summary"]
+        src__prollama__proxy__Proxy__get_app["get_app"]
+        src__prollama__auth__get_credentials_path["get_credentials_path"]
+        src__prollama__auth__load_github_token["load_github_token"]
+        src__prollama__auth__login_device_flow{{login_device_flow CC=19}}
+        src__prollama__auth__logout["logout"]
+        src__prollama__auth__is_logged_in["is_logged_in"]
+        src__prollama__auth__get_auth_headers["get_auth_headers"]
+        src__prollama___load_version["_load_version"]
         src__prollama__cli___load_config["_load_config"]
         src__prollama__cli___print_banner["_print_banner"]
         src__prollama__cli__main["main"]
-        src__prollama__cli__init["init"]
-        src__prollama__cli__start["start"]
-        src__prollama__cli__stop["stop"]
-        src__prollama__cli__status["status"]
-        src__prollama__cli__solve["solve"]
-        src__prollama__cli__anonymize["anonymize"]
-        src__prollama__cli__config_group["config_group"]
-        src__prollama__cli__config_show["config_show"]
-        src__prollama__cli__config_path["config_path"]
-        src__prollama__cli__shell["shell"]
-        ...["+69 more"]
+        src__prollama__cli__login["login"]
+        src__prollama__cli__logout["logout"]
+        ...["+120 more"]
     end
 
-    class src__prollama__proxy__MetricsCollector__record,src__prollama__proxy__MetricsCollector__summary,src__prollama__cli___load_config,src__prollama__cli___print_banner,src__prollama__cli__main,src__prollama__cli__init,src__prollama__cli__start,src__prollama__cli__stop,src__prollama__cli__status,src__prollama__cli__solve entry
+    class src__prollama__proxy__MetricsCollector__record,src__prollama__proxy__MetricsCollector__summary,src__prollama__proxy__Proxy__get_app,src__prollama__auth__logout,src__prollama__auth__get_auth_headers,src__prollama___load_version,src__prollama__cli___load_config,src__prollama__cli___print_banner,src__prollama__cli__main,src__prollama__cli__login entry
