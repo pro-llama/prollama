@@ -1,0 +1,36 @@
+# vallm batch | 73f | 40✓ 2⚠ 4✗ | 2026-04-01
+
+SUMMARY:
+  scanned: 73  passed: 40 (54.8%)  warnings: 2  errors: 4  unsupported: 29
+
+WARNINGS[2]{path,score}:
+  src/prollama/config.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,load has cyclomatic complexity 19 (max: 15),129
+      complexity.lizard_cc,warning,load: CC=19 exceeds limit 15,129
+  src/prollama/proxy.py,0.97
+    issues[1]{rule,severity,message,line}:
+      complexity.lizard_cc,warning,create_app.chat_completions: CC=18 exceeds limit 15,146
+
+ERRORS[4]{path,score}:
+  examples/sample_code/fintech_app.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'stripe' not found,8
+  examples/sample_code/ml_pipeline.py,0.79
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'boto3' not found,7
+      python.import.resolvable,error,Module 'wandb' not found,77
+      python.import.resolvable,error,Module 'psycopg2' not found,85
+  src/prollama/anonymizer/nlp_layer.py,0.89
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'presidio_analyzer' not found,117
+  examples/sample_code/api_secrets.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'jwt' not found,7
+
+UNSUPPORTED[5]{bucket,count}:
+  *.md,19
+  Dockerfile*,1
+  *.txt,1
+  *.yml,1
+  other,7

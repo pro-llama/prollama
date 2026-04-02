@@ -1,0 +1,54 @@
+# prollama | 98 func | 13f | 4191L | python | 2026-04-01
+
+HEALTH:
+  CC̄=3.6  critical=6 (limit:10)  dup=0  cycles=0
+
+ALERTS[13]:
+  !!! high_fan_out     create_app = 41 (limit:10)
+  !!  high_fan_out     anonymize = 17 (limit:10)
+  !   cc_exceeded      Config.load = 19 (limit:15)
+  !   cc_exceeded      ProllamaShell._cmd_solve = 15 (limit:15)
+  !   high_fan_out     ASTAnonymizer.anonymize = 14 (limit:10)
+  !   high_fan_out     TaskExecutor.solve = 14 (limit:10)
+  !   high_fan_out     Config.load = 13 (limit:10)
+  !   high_fan_out     solve = 12 (limit:10)
+  !   high_fan_out     ProllamaShell._cmd_solve = 12 (limit:10)
+  !   high_fan_out     ASTAnonymizer._walk_tree = 12 (limit:10)
+
+MODULES[20] (top by size):
+  M[src/prollama/shell.py] 368L C:1 F:15 CC↑15 D:0 (python)
+  M[src/prollama/anonymizer/ast_layer.py] 353L C:1 F:9 CC↑11 D:0 (python)
+  M[src/prollama/proxy.py] 305L C:2 F:5 CC↑6 D:1 (python)
+  M[src/prollama/cli.py] 301L C:0 F:13 CC↑9 D:0 (python)
+  M[src/prollama/executor/task_executor.py] 261L C:1 F:9 CC↑11 D:2 (python)
+  M[src/prollama/config.py] 233L C:6 F:6 CC↑19 D:0 (python)
+  M[src/prollama/anonymizer/nlp_layer.py] 187L C:1 F:7 CC↑5 D:0 (python)
+  M[src/prollama/tickets.py] 183L C:3 F:8 CC↑9 D:0 (python)
+  M[src/prollama/router/model_router.py] 129L C:2 F:5 CC↑13 D:0 (python)
+  M[src/prollama/anonymizer/regex_layer.py] 114L C:2 F:5 CC↑5 D:0 (python)
+  M[src/prollama/models.py] 107L C:10 F:0 CC↑0 D:0 (python)
+  M[src/prollama/anonymizer/pipeline.py] 99L C:1 F:5 CC↑7 D:0 (python)
+  M[src/prollama/llm.py] 90L C:3 F:5 CC↑4 D:0 (python)
+  M[src/prollama/core.py] 84L C:1 F:6 CC↑4 D:0 (python)
+  M[project.sh] 36L C:0 F:0 CC↑0 D:0 (shell)
+  LANGS: python:19/shell:1
+
+HOTSPOTS[10]:
+  ★ create_app fan=41  // Create the FastAPI proxy application.
+  ★ anonymize fan=17  // Anonymize a source file and show results.
+  ★ ASTAnonymizer.anonymize fan=14  // Parse code and anonymize business-logic identifiers.
+
+Returns (anonymized_code, 
+  ★ TaskExecutor.solve fan=14  // Run the full solve loop for a task.
+  ★ Config.load fan=13  // Load config from YAML, .env, and environment variables.
+
+Priority: env vars > .e
+
+REFACTOR[4]:
+  [1] M/L Split ProllamaShell._cmd_solve (CC=15 → target CC<10)
+  [2] M/L Split Config.load (CC=19 → target CC<10)
+  [3] M/M Reduce create_app fan-out (currently 41)
+  [4] M/M Reduce anonymize fan-out (currently 17)
+
+EVOLUTION:
+  2026-04-01 CC̄=3.6 crit=6 4191L // Automated analysis

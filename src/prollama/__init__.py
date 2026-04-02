@@ -18,6 +18,10 @@ def _load_version() -> str:
 
 
 __version__ = _load_version()
-__all__ = ["Config", "Proxy", "TaskExecutor", "Anonymizer"]
+__all__ = ["Config", "Proxy", "TaskExecutor", "Anonymizer", "LLMClient"]
 
+from prollama.anonymizer.pipeline import AnonymizationPipeline as Anonymizer
 from prollama.config import Config
+from prollama.executor.task_executor import TaskExecutor
+from prollama.llm import LLMClient
+from prollama.proxy import Proxy

@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from prollama.config import Config, ProviderConfig
+from prollama.config import Config, ProviderConfig, ProxyConfig
 from prollama.proxy import Proxy
 from prollama.llm import LLMClient
 
@@ -15,8 +15,14 @@ from prollama.llm import LLMClient
 class TestIntegration:
     """Integration tests for the complete system."""
 
-    def test_config_to_client_workflow(self):
+    def test_config_to_client_workflow(self, monkeypatch):
         """Test loading config and creating client."""
+        # Clear environment variables that might auto-add providers
+        monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        monkeypatch.delenv("OLLAMA_BASE_URL", raising=False)
+        
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
             config_content = """
 providers:
@@ -68,7 +74,7 @@ providers:
     def test_proxy_integration(self):
         """Test proxy integration with config."""
         config = Config(
-            proxy_url="http://localhost:8741",
+            proxy=ProxyConfig(host="localhost", port=8741),
             providers=[
                 ProviderConfig(
                     name="test",
@@ -100,11 +106,13 @@ providers:
         """Test complete config save/load cycle."""
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
         monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        monkeypatch.delenv("PROXY_HOST", raising=False)
+        monkeypatch.delenv("PROXY_PORT", raising=False)
         
         # Create original config
         original = Config(
             debug=True,
-            proxy_url="http://test.proxy:8080",
+            proxy=ProxyConfig(host="test.proxy", port=8080),
             providers=[
                 ProviderConfig(
                     name="provider1",

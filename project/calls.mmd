@@ -1,0 +1,49 @@
+flowchart LR
+    subgraph examples__anonymize_code
+        examples__anonymize_code__main["main"]
+        examples__anonymize_code__anonymize_and_compare["anonymize_and_compare"]
+    end
+    subgraph examples__batch_scan
+        examples__batch_scan__main["main"]
+        examples__batch_scan__scan_project["scan_project"]
+    end
+    subgraph src__prollama
+        src__prollama__cli__shell["shell"]
+        src__prollama__cli__init["init"]
+        src__prollama__config__Config__load["load"]
+        src__prollama__shell__ProllamaShell___cmd_solve["_cmd_solve"]
+        src__prollama__cli___load_config["_load_config"]
+        src__prollama__executor__task_executor__classify_complexity["classify_complexity"]
+        src__prollama__cli__main["main"]
+        src__prollama__cli__config_show["config_show"]
+        src__prollama__router__model_router___complexity_to_start_tier["_complexity_to_start_tier"]
+        src__prollama__executor__task_executor__classify_type["classify_type"]
+        src__prollama__cli__status["status"]
+        src__prollama__config__Config__write_template["write_template"]
+        src__prollama__proxy__create_app["create_app"]
+        src__prollama__cli__solve["solve"]
+        src__prollama__cli___print_banner["_print_banner"]
+        src__prollama__cli__anonymize["anonymize"]
+        src__prollama__cli__start["start"]
+        src__prollama__router__model_router__ModelRouter__select["select"]
+        src__prollama__executor__task_executor__TaskExecutor__solve["solve"]
+    end
+    examples__batch_scan__main --> examples__batch_scan__scan_project
+    examples__anonymize_code__main --> examples__anonymize_code__anonymize_and_compare
+    src__prollama__cli___load_config --> src__prollama__config__Config__load
+    src__prollama__cli__main --> src__prollama__cli___print_banner
+    src__prollama__cli__init --> src__prollama__config__Config__write_template
+    src__prollama__cli__start --> src__prollama__cli___load_config
+    src__prollama__cli__start --> src__prollama__proxy__create_app
+    src__prollama__cli__status --> src__prollama__cli___load_config
+    src__prollama__cli__status --> src__prollama__cli___print_banner
+    src__prollama__cli__solve --> src__prollama__cli___load_config
+    src__prollama__cli__solve --> src__prollama__executor__task_executor__classify_complexity
+    src__prollama__cli__anonymize --> src__prollama__cli___load_config
+    src__prollama__cli__config_show --> src__prollama__cli___load_config
+    src__prollama__cli__shell --> src__prollama__cli___load_config
+    src__prollama__shell__ProllamaShell___cmd_solve --> src__prollama__executor__task_executor__classify_complexity
+    src__prollama__shell__ProllamaShell___cmd_solve --> src__prollama__executor__task_executor__classify_type
+    src__prollama__executor__task_executor__TaskExecutor__solve --> src__prollama__executor__task_executor__classify_type
+    src__prollama__executor__task_executor__TaskExecutor__solve --> src__prollama__executor__task_executor__classify_complexity
+    src__prollama__router__model_router__ModelRouter__select --> src__prollama__router__model_router___complexity_to_start_tier

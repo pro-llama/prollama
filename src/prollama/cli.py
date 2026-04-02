@@ -1,222 +1,300 @@
-"""
-Command Line Interface for Prollama
+"""prollama CLI — command-line interface and interactive shell.
+
+Usage:
+    prollama init [--provider NAME]
+    prollama start [--port PORT]
+    prollama stop
+    prollama status
+    prollama solve DESCRIPTION [--file PATH] [--error MSG]
+    prollama anonymize FILE
+    prollama config show
+    prollama shell
 """
 
-import typer
-from typing import Optional
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import click
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 
-from .core import ProllamaCore
-from .llm import LLMInterface, Message
-from .proxy import ProxyManager, ProxyConfig, ProxyRequest
-from .tickets import TicketManager, TicketCreate
+from prollama import __version__
+from prollama.config import DEFAULT_CONFIG_FILE, Config
 
 console = Console()
-app = typer.Typer(help="Prollama - Progressive algorithmization toolchain")
 
 
-@app.command()
-def version():
-    """Show version information"""
-    console.print(Panel(f"[bold blue]Prollama v0.1.1[/bold blue]\nFrom LLM to deterministic code, from proxy to tickets"))
+# ── helpers ────────────────────────────────────────────────────────────────
+
+def _load_config(ctx: click.Context) -> Config:
+    config_path = ctx.obj.get("config") if ctx.obj else None
+    return Config.load(Path(config_path) if config_path else None)
 
 
-@app.command()
-def config(
-    key: Optional[str] = typer.Argument(None, help="Configuration key to get/set"),
-    value: Optional[str] = typer.Argument(None, help="Configuration value to set"),
-    config_path: Optional[str] = typer.Option(None, "--config", "-c", help="Configuration file path")
-):
-    """Manage configuration"""
-    core = ProllamaCore(config_path)
-    
-    if key is None:
-        # Show all configuration
-        console.print("[bold]Current configuration:[/bold]")
-        console.print(core.config)
-    elif value is None:
-        # Get specific configuration value
-        config_value = core.get_config_value(key)
-        console.print(f"[bold]{key}[/bold]: {config_value}")
-    else:
-        # Set configuration value
-        core.set_config_value(key, value)
-        core.save_config()
-        console.print(f"[green]✓[/green] Set {key} = {value}")
-
-
-@app.command()
-def chat(
-    prompt: str = typer.Argument(..., help="Prompt to send to LLM"),
-    system: Optional[str] = typer.Option(None, "--system", "-s", help="System prompt"),
-    model: Optional[str] = typer.Option(None, "--model", "-m", help="LLM model to use"),
-    config_path: Optional[str] = typer.Option(None, "--config", "-c", help="Configuration file path")
-):
-    """Chat with LLM"""
-    core = ProllamaCore(config_path)
-    
-    # Get LLM configuration
-    api_key = core.get_config_value("llm.api_key")
-    provider = core.get_config_value("llm.provider", "openai")
-    model_name = model or core.get_config_value("llm.model", "gpt-3.5-turbo")
-    
-    if not api_key:
-        console.print("[red]✗[/red] LLM API key not configured. Set it with: prollama config llm.api_key YOUR_KEY")
-        raise typer.Exit(1)
-    
-    # Initialize LLM interface
-    llm = LLMInterface(provider=provider, api_key=api_key, model=model_name)
-    
-    try:
-        console.print(f"[blue]🤖[/blue] Sending prompt to {model_name}...")
-        response = llm.simple_chat(prompt, system)
-        
-        console.print("[bold]Response:[/bold]")
-        console.print(Panel(response))
-        
-    except Exception as e:
-        console.print(f"[red]✗[/red] Chat failed: {e}")
-        raise typer.Exit(1)
-    finally:
-        llm.close()
-
-
-@app.command()
-def proxy_test(
-    config_path: Optional[str] = typer.Option(None, "--config", "-c", help="Configuration file path")
-):
-    """Test proxy connectivity"""
-    core = ProllamaCore(config_path)
-    
-    # Get proxy configuration
-    proxy_config = ProxyConfig(
-        host=core.get_config_value("proxy.host", "localhost"),
-        port=core.get_config_value("proxy.port", 8080),
-        enabled=core.get_config_value("proxy.enabled", False)
+def _print_banner() -> None:
+    console.print(
+        Panel(
+            f"[bold cyan]prollama[/] v{__version__}\n"
+            "[dim]Intelligent LLM Execution Layer[/]",
+            border_style="cyan",
+        )
     )
-    
-    proxy_manager = ProxyManager(proxy_config)
-    
-    try:
-        console.print("[blue]🔗[/blue] Testing proxy connectivity...")
-        success = proxy_manager.test_proxy()
-        
-        if success:
-            console.print("[green]✓[/green] Proxy test passed")
-        else:
-            console.print("[red]✗[/red] Proxy test failed")
-            raise typer.Exit(1)
-            
-    except Exception as e:
-        console.print(f"[red]✗[/red] Proxy test failed: {e}")
-        raise typer.Exit(1)
-    finally:
-        proxy_manager.close()
 
 
-@app.command()
-def ticket_list(
-    status: str = typer.Option("open", "--status", "-s", help="Ticket status (open/closed)"),
-    config_path: Optional[str] = typer.Option(None, "--config", "-c", help="Configuration file path")
-):
-    """List tickets"""
-    core = ProllamaCore(config_path)
-    
-    # Get ticket configuration
-    token = core.get_config_value("tickets.token")
-    repo = core.get_config_value("tickets.repo")
-    provider = core.get_config_value("tickets.provider", "github")
-    
-    if not token or not repo:
-        console.print("[red]✗[/red] Ticket configuration incomplete. Set tickets.token and tickets.repo")
-        raise typer.Exit(1)
-    
-    # Initialize ticket manager
-    ticket_manager = TicketManager(provider=provider, token=token, repo=repo)
-    
-    try:
-        console.print(f"[blue]📋[/blue] Listing {status} tickets...")
-        tickets = ticket_manager.list_tickets(status)
-        
-        if not tickets:
-            console.print(f"[yellow]⚠[/yellow] No {status} tickets found")
+# ── root group ─────────────────────────────────────────────────────────────
+
+@click.group(invoke_without_command=True)
+@click.option("--config", "-c", "config_path", default=None, help="Path to config.yaml")
+@click.option("--version", "-V", is_flag=True, help="Show version")
+@click.pass_context
+def main(ctx: click.Context, config_path: str | None, version: bool) -> None:
+    """prollama — Intelligent LLM Execution Layer for developer teams."""
+    ctx.ensure_object(dict)
+    ctx.obj["config"] = config_path
+
+    if ctx.invoked_subcommand is None:
+        if version:
+            console.print(f"prollama {__version__}")
+            ctx.exit(0)
+        console.print(ctx.get_help())
+        ctx.exit(1)
+
+
+# ── init ───────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.option("--provider", "-p", default="ollama", help="Default provider (ollama, openai, anthropic)")
+@click.pass_context
+def init(ctx: click.Context, provider: str) -> None:
+    """Initialize prollama configuration."""
+    config_path = Path(ctx.obj.get("config") or DEFAULT_CONFIG_FILE)
+    if config_path.exists():
+        if not click.confirm(f"Config already exists at {config_path}. Overwrite?"):
             return
-        
-        # Create table
-        table = Table(title=f"{status.capitalize()} Tickets")
-        table.add_column("ID", style="cyan", no_wrap=True)
-        table.add_column("Title", style="magenta")
-        table.add_column("Status", style="green")
-        table.add_column("Labels", style="yellow")
-        
-        for ticket in tickets:
-            table.add_row(
-                str(ticket.id),
-                ticket.title[:50] + "..." if len(ticket.title) > 50 else ticket.title,
-                ticket.status,
-                ", ".join(ticket.labels[:3])  # Show first 3 labels
-            )
-        
-        console.print(table)
-        
-    except Exception as e:
-        console.print(f"[red]✗[/red] Failed to list tickets: {e}")
-        raise typer.Exit(1)
-    finally:
-        ticket_manager.close()
+
+    path = Config.write_template(config_path)
+    console.print(f"[green]✓[/] Config created at [bold]{path}[/]")
+    console.print(f"  Default provider: [cyan]{provider}[/]")
+    console.print("\n  Edit the file to add your API keys, then run [bold]prollama start[/]")
 
 
-@app.command()
-def ticket_create(
-    title: str = typer.Argument(..., help="Ticket title"),
-    description: str = typer.Option(..., "--description", "-d", help="Ticket description"),
-    labels: Optional[str] = typer.Option(None, "--labels", "-l", help="Comma-separated labels"),
-    priority: str = typer.Option("medium", "--priority", "-p", help="Ticket priority"),
-    config_path: Optional[str] = typer.Option(None, "--config", "-c", help="Configuration file path")
-):
-    """Create a new ticket"""
-    core = ProllamaCore(config_path)
-    
-    # Get ticket configuration
-    token = core.get_config_value("tickets.token")
-    repo = core.get_config_value("tickets.repo")
-    provider = core.get_config_value("tickets.provider", "github")
-    
-    if not token or not repo:
-        console.print("[red]✗[/red] Ticket configuration incomplete. Set tickets.token and tickets.repo")
-        raise typer.Exit(1)
-    
-    # Parse labels
-    label_list = labels.split(",") if labels else []
-    
-    # Create ticket
-    ticket_data = TicketCreate(
-        title=title,
-        description=description,
-        labels=label_list,
-        priority=priority
-    )
-    
-    # Initialize ticket manager
-    ticket_manager = TicketManager(provider=provider, token=token, repo=repo)
-    
+# ── start ──────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.option("--host", default=None, help="Proxy bind host")
+@click.option("--port", "-p", default=None, type=int, help="Proxy port")
+@click.pass_context
+def start(ctx: click.Context, host: str | None, port: int | None) -> None:
+    """Start the prollama proxy server."""
+    config = _load_config(ctx)
+
+    bind_host = host or config.proxy.host
+    bind_port = port or config.proxy.port
+
+    console.print(f"[green]▶[/] Starting prollama proxy on [bold]{bind_host}:{bind_port}[/]")
+    console.print(f"  Privacy level: [cyan]{config.privacy.level}[/]")
+    console.print(f"  Routing: [cyan]{config.routing.strategy}[/]")
+    console.print(f"  Providers: [cyan]{', '.join(config.provider_names()) or 'none configured'}[/]")
+    console.print(f"\n  Set [bold]OPENAI_BASE_URL=http://{bind_host}:{bind_port}/v1[/] in your IDE")
+
     try:
-        console.print(f"[blue]📝[/blue] Creating ticket: {title}")
-        ticket = ticket_manager.create_ticket(ticket_data)
-        
-        console.print(f"[green]✓[/green] Ticket created successfully!")
-        console.print(f"ID: {ticket.id}")
-        console.print(f"Title: {ticket.title}")
-        console.print(f"Status: {ticket.status}")
-        
-    except Exception as e:
-        console.print(f"[red]✗[/red] Failed to create ticket: {e}")
-        raise typer.Exit(1)
-    finally:
-        ticket_manager.close()
+        import uvicorn
 
+        from prollama.proxy import create_app
+        app = create_app(config)
+        uvicorn.run(app, host=bind_host, port=bind_port, log_level="info")
+    except ImportError:
+        console.print(
+            "\n[yellow]⚠[/] Proxy server requires FastAPI + uvicorn.\n"
+            "  Install with: [bold]pip install prollama[proxy][/]"
+        )
+        sys.exit(1)
+
+
+# ── stop ───────────────────────────────────────────────────────────────────
+
+@main.command()
+def stop() -> None:
+    """Stop the prollama proxy server."""
+    # In production this would signal a running daemon; for now, placeholder.
+    console.print("[yellow]⏹[/] Proxy stop requested (use Ctrl+C on the running server)")
+
+
+# ── status ─────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.pass_context
+def status(ctx: click.Context) -> None:
+    """Show prollama status and configuration."""
+    config = _load_config(ctx)
+
+    _print_banner()
+
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column(style="bold")
+    table.add_column()
+
+    table.add_row("Config", str(DEFAULT_CONFIG_FILE))
+    table.add_row("Privacy", config.privacy.level)
+    table.add_row("Routing", config.routing.strategy)
+    table.add_row("Proxy", f"{config.proxy.host}:{config.proxy.port}")
+    table.add_row("Max iterations", str(config.executor.max_iterations))
+    table.add_row("Budget", f"${config.executor.budget:.2f}")
+
+    console.print(table)
+
+    if config.providers:
+        console.print("\n[bold]Providers:[/]")
+        for p in config.providers:
+            models = ", ".join(p.models) if p.models else "auto"
+            url = p.base_url or "(default)"
+            key_status = "[green]✓ key set[/]" if p.resolve_api_key() else "[dim]no key[/]"
+            console.print(f"  [cyan]{p.name}[/]  {url}  models=[dim]{models}[/]  {key_status}")
+    else:
+        console.print("\n[yellow]No providers configured.[/] Run [bold]prollama init[/]")
+
+
+# ── solve ──────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.argument("description")
+@click.option("--file", "-f", "file_path", default=None, help="Source file to fix")
+@click.option("--error", "-e", default=None, help="Error message or traceback")
+@click.option("--ticket", "-t", default=None, help="Ticket ref (e.g. github:org/repo#142)")
+@click.option("--dry-run", is_flag=True, help="Show what would happen without executing")
+@click.pass_context
+def solve(
+    ctx: click.Context,
+    description: str,
+    file_path: str | None,
+    error: str | None,
+    ticket: str | None,
+    dry_run: bool,
+) -> None:
+    """Solve a coding task using LLM orchestration."""
+    from prollama.executor import TaskExecutor
+    from prollama.models import Task
+
+    config = _load_config(ctx)
+    task = Task(
+        description=description,
+        file_path=file_path,
+        error=error,
+        ticket_ref=ticket,
+    )
+
+    executor = TaskExecutor(config)
+
+    # Classify for display
+    from prollama.executor.task_executor import classify_complexity, classify_type
+    task.complexity = classify_complexity(task)
+    task.task_type = classify_type(task)
+
+    console.print(f"\n[bold]Task:[/] {task.description}")
+    console.print(f"  ID: [dim]{task.id}[/]")
+    console.print(f"  Type: [cyan]{task.task_type.value}[/]  Complexity: [cyan]{task.complexity.value}[/]")
+
+    if file_path:
+        console.print(f"  File: [dim]{file_path}[/]")
+
+    model = executor.router.select(complexity=task.complexity)
+    if model:
+        console.print(f"  Model: [cyan]{model.name}[/] ({model.tier.value})")
+
+    if dry_run:
+        console.print("\n[yellow]Dry run — no changes made.[/]")
+        return
+
+    console.print("\n[bold green]Solving...[/]\n")
+    result = executor.solve(task)
+
+    if result.status.value == "completed":
+        console.print(f"[green]✓[/] Solved in {result.iterations} iteration(s), {result.duration_seconds:.1f}s")
+        console.print(f"  Model: [cyan]{result.model_used}[/]  Cost: [dim]${result.cost_usd:.4f}[/]")
+        if result.patch:
+            console.print(Panel(result.patch, title="Patch", border_style="green"))
+    else:
+        console.print(f"[red]✗[/] Failed: {result.error_message}")
+        console.print(f"  Iterations: {result.iterations}  Cost: ${result.cost_usd:.4f}")
+
+
+# ── anonymize ──────────────────────────────────────────────────────────────
+
+@main.command()
+@click.argument("file_path", type=click.Path(exists=True))
+@click.option("--level", "-l", default=None, type=click.Choice(["none", "basic", "full"]))
+@click.option("--output", "-o", default=None, help="Output file (default: stdout)")
+@click.pass_context
+def anonymize(ctx: click.Context, file_path: str, level: str | None, output: str | None) -> None:
+    """Anonymize a source file and show results."""
+    from prollama.anonymizer import AnonymizationPipeline
+    from prollama.models import PrivacyLevel
+
+    config = _load_config(ctx)
+    privacy_level = PrivacyLevel(level) if level else PrivacyLevel(config.privacy.level)
+
+    code = Path(file_path).read_text()
+    pipeline = AnonymizationPipeline(privacy_level=privacy_level)
+    result = pipeline.run(code)
+
+    if result.stats:
+        console.print("[bold]Anonymization report:[/]")
+        for category, count in sorted(result.stats.items()):
+            console.print(f"  {category}: [cyan]{count}[/] item(s) found & replaced")
+        console.print()
+
+    if output:
+        Path(output).write_text(result.anonymized_code)
+        console.print(f"[green]✓[/] Written to {output}")
+    else:
+        console.print(Panel(result.anonymized_code, title="Anonymized", border_style="blue"))
+
+    if result.mappings:
+        console.print("\n[bold]Mappings (for rehydration):[/]")
+        for m in result.mappings[:20]:
+            console.print(f"  {m.replacement} ← [dim]{m.original[:40]}{'…' if len(m.original) > 40 else ''}[/]")
+        if len(result.mappings) > 20:
+            console.print(f"  [dim]... and {len(result.mappings) - 20} more[/]")
+
+
+# ── config ─────────────────────────────────────────────────────────────────
+
+@main.group(name="config")
+def config_group() -> None:
+    """Manage prollama configuration."""
+    pass
+
+
+@config_group.command(name="show")
+@click.pass_context
+def config_show(ctx: click.Context) -> None:
+    """Show current configuration."""
+    config = _load_config(ctx)
+    console.print_json(json.dumps(config.model_dump(mode="json"), indent=2))
+
+
+@config_group.command(name="path")
+def config_path() -> None:
+    """Show config file path."""
+    console.print(str(DEFAULT_CONFIG_FILE))
+
+
+# ── shell ──────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.pass_context
+def shell(ctx: click.Context) -> None:
+    """Start interactive prollama shell."""
+    from prollama.shell import ProllamaShell
+    config = _load_config(ctx)
+    ProllamaShell(config).run()
+
+
+# ── entry point ────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    app()
+    main()

@@ -1,49 +1,130 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "prollama"
-version = "0.1.2"
-description = "Progressive algorithmization toolchain — from LLM to deterministic code, from proxy to tickets"
+version = "0.2.4"
+description = "Intelligent LLM Execution Layer for developer teams — anonymize code, route models, solve tickets."
 readme = "README.md"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = ">=3.10"
-authors = [{name = "Tom Sapletta", email = "tom@sapletta.com"}]
-keywords = [
-    "llm", "devtools", "proxy", "tickets", "progressive-algorithmization",
-    "mcp", "propact", "code-analysis", "automation", "workflow",
+authors = [
+    {name = "Tom Sapletta", email = "tom@sapletta.com"},
 ]
+keywords = ["llm", "proxy", "code-privacy", "ai", "coding", "anonymization", "pyqual"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
 ]
-
 dependencies = [
+    "click>=8.1",
+    "rich>=13.0",
+    "prompt-toolkit>=3.0",
     "pyyaml>=6.0",
     "httpx>=0.27",
-    "rich>=13.0",
-    "typer>=0.12",
     "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "python-dotenv>=1.0",
+    "goal>=2.1.0",
+    "costs>=0.1.20",
+    "pfix>=0.1.60",
 ]
 
 [project.optional-dependencies]
-all = ["proxym", "planfile", "llx", "vallm", "code2llm", "redup"]
-proxy = ["proxym"]
-tickets = ["planfile"]
-analysis = ["code2llm", "vallm", "redup"]
-routing = ["llx"]
-dev = ["pytest", "ruff", "mypy"]
+nlp = ["presidio-analyzer>=2.2", "presidio-anonymizer>=2.2", "spacy>=3.7"]
+ast = ["tree-sitter>=0.22", "tree-sitter-python>=0.23", "tree-sitter-javascript>=0.23"]
+proxy = ["fastapi>=0.111", "uvicorn[standard]>=0.30"]
+all = ["prollama[nlp,ast,proxy]"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "goal>=2.1.0",
+    "costs>=0.1.20",
+    "pfix>=0.1.60",
+]
 
 [project.scripts]
-devloop = "devloop.cli:app"
+prollama = "prollama.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/semcod/devloop"
-Repository = "https://github.com/semcod/devloop"
+Homepage = "https://prollama.dev"
+Repository = "https://github.com/softreck/prollama"
+Documentation = "https://docs.prollama.dev"
+Changelog = "https://github.com/softreck/prollama/blob/main/CHANGELOG.md"
+Issues = "https://github.com/softreck/prollama/issues"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/prollama"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests requiring external services",
+]
+
+[tool.coverage.run]
+source = ["prollama"]
+omit = ["*/tests/*", "*/__main__.py", "*/proxy.py", "*/shell.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+fail_under = 75
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pfix]
+# Self-healing Python configuration
+model = "openrouter/qwen/qwen3-coder-next"
+auto_apply = true
+auto_install_deps = true
+auto_restart = false
+max_retries = 3
+create_backups = false
+git_auto_commit = false
+
+[tool.pfix.runtime_todo]
+enabled = true
+todo_file = "TODO.md"
+min_severity = "low"
+deduplicate = true
+
+[tool.costs]
+# AI Cost tracking configuration
+badge = true
+update_readme = true
+readme_path = "README.md"
+default_model = "openrouter/qwen/qwen3-coder-next"
+analysis_mode = "byok"
+full_history = true
+max_commits = 500
+
+# Cost thresholds for badge colors (USD)
+badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0 }

@@ -1,0 +1,40 @@
+# docker-compose.yml — prollama + Ollama (local LLM)
+#
+# Usage:
+#   docker compose up -d
+#   export OPENAI_BASE_URL=http://localhost:8741/v1
+#
+# Then use any OpenAI-compatible tool — requests are anonymized automatically.
+
+services:
+  prollama:
+    build: .
+    ports:
+      - "8741:8741"
+    environment:
+      - PROLLAMA_PRIVACY_LEVEL=full
+    volumes:
+      - prollama-data:/home/prollama/.prollama
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    # Uncomment for GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  prollama-data:
+  ollama-models:

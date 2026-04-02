@@ -1,0 +1,115 @@
+# prollama | 20f 2889L | shell:1,python:19 | 2026-04-01
+# stats: 98 func | 0 cls | 20 mod | CC̄=3.6 | critical:2 | cycles:0
+# alerts[5]: fan-out create_app=41; CC Config.load=19; fan-out anonymize=17; CC ProllamaShell._cmd_solve=15; fan-out ASTAnonymizer.anonymize=14
+# hotspots[5]: create_app fan=41; anonymize fan=17; ASTAnonymizer.anonymize fan=14; TaskExecutor.solve fan=14; Config.load fan=13
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[20]:
+  project.sh,36
+  src/prollama/__init__.py,9
+  src/prollama/__main__.py,6
+  src/prollama/anonymizer/__init__.py,14
+  src/prollama/anonymizer/ast_layer.py,353
+  src/prollama/anonymizer/nlp_layer.py,187
+  src/prollama/anonymizer/pipeline.py,99
+  src/prollama/anonymizer/regex_layer.py,114
+  src/prollama/cli.py,301
+  src/prollama/config.py,233
+  src/prollama/core.py,84
+  src/prollama/executor/__init__.py,5
+  src/prollama/executor/task_executor.py,261
+  src/prollama/llm.py,90
+  src/prollama/models.py,107
+  src/prollama/proxy.py,305
+  src/prollama/router/__init__.py,5
+  src/prollama/router/model_router.py,129
+  src/prollama/shell.py,368
+  src/prollama/tickets.py,183
+D:
+  src/prollama/config.py:
+    e: ProviderConfig,PrivacyConfig,RoutingConfig,ProxyConfig,ExecutorConfig,Config
+    ProviderConfig(BaseModel): resolve_api_key(0)
+    PrivacyConfig(BaseModel):
+    RoutingConfig(BaseModel):
+    ProxyConfig(BaseModel):
+    ExecutorConfig(BaseModel):
+    Config(BaseModel): load(1),save(1),write_template(0),get_provider(1),provider_names(0)  # Root configuration for prollama...
+  src/prollama/shell.py:
+    e: ProllamaShell
+    ProllamaShell: __init__(1),run(0),_dispatch(1),_cmd_solve(1),_cmd_anonymize(1),_cmd_status(1),_cmd_providers(1),_cmd_models(1),_cmd_config(1),_cmd_history(1),_cmd_cost(1),_cmd_help(1),_cmd_clear(1),_cmd_exit(1),_print_welcome(0)  # Interactive REPL for prollama...
+  src/prollama/router/model_router.py:
+    e: ModelInfo,ModelRouter,_complexity_to_start_tier
+    ModelInfo:
+    ModelRouter: available_models(0),select(2),escalate(1),estimate_cost(3)  # Select and escalate models based on task complexity and stra...
+    _complexity_to_start_tier(complexity)
+  src/prollama/anonymizer/ast_layer.py:
+    e: ASTAnonymizer
+    ASTAnonymizer: anonymize(1),rehydrate(2),reset(0),_get_language(0),_walk_tree(3),_is_import_context(1),_is_decorator_context(1),_get_replacement(1),_classify_identifier(0)  # Anonymize identifiers in source code using tree-sitter AST p...
+  src/prollama/executor/task_executor.py:
+    e: TaskExecutor,classify_complexity,classify_type
+    TaskExecutor: __init__(1),solve(1),_build_context(1),_call_llm(3),_run_tests(1),_fail(5),_default_base_url(0)  # Orchestrate the full task-solving loop...
+    classify_complexity(task)
+    classify_type(task)
+  src/prollama/cli.py:
+    e: _load_config,_print_banner,main,init,start,stop,status,solve,anonymize,config_group,config_show,config_path,shell
+    _load_config(ctx)
+    _print_banner()
+    main(ctx;config_path;version)
+    init(ctx;provider)
+    start(ctx;host;port)
+    stop()
+    status(ctx)
+    solve(ctx;description;file_path;error;ticket;dry_run)
+    anonymize(ctx;file_path;level;output)
+    config_group()
+    config_show(ctx)
+    config_path()
+    shell(ctx)
+  src/prollama/tickets.py:
+    e: Ticket,TicketCreate,TicketManager
+    Ticket(BaseModel):  # Ticket model for issue tracking...
+    TicketCreate(BaseModel):  # Ticket creation model...
+    TicketManager: __init__(3),create_ticket(1),_github_create_ticket(1),list_tickets(1),_github_list_tickets(1),update_ticket(1),_github_update_ticket(1),close(0)  # Manager for ticket operations across different providers...
+  src/prollama/anonymizer/pipeline.py:
+    e: AnonymizationPipeline
+    AnonymizationPipeline: __init__(1),run(2),rehydrate(2),_run_nlp(0),_run_ast(1)  # Orchestrate the anonymization layers according to privacy le...
+  src/prollama/proxy.py:
+    e: RequestMetric,MetricsCollector,create_app,_resolve_provider,_record_error
+    RequestMetric:
+    MetricsCollector: record(1),summary(0)
+    create_app(config)
+    _resolve_provider(config;model)
+    _record_error(metrics;model;provider;anonymized_count;t0;status)
+  src/prollama/anonymizer/nlp_layer.py:
+    e: NLPAnonymizer
+    NLPAnonymizer: __init__(0),anonymize(1),reset(0),_check_presidio(-1),_anonymize_presidio(1),_anonymize_heuristic(1),_next_token(1)  # Detect and anonymize PII in code comments and string literal...
+  src/prollama/anonymizer/regex_layer.py:
+    e: SecretPattern,RegexAnonymizer
+    SecretPattern:
+    RegexAnonymizer: __init__(1),_next_token(1),anonymize(1),rehydrate(2),reset(0)  # Apply regex-based anonymization to source code text...
+  src/prollama/core.py:
+    e: ProllamaCore
+    ProllamaCore: __init__(1),load_config(0),get_default_config(0),save_config(0),get_config_value(2),set_config_value(2)  # Main core class for Prollama functionality...
+  src/prollama/llm.py:
+    e: Message,LLMResponse,LLMInterface
+    Message(BaseModel):  # Message model for LLM interactions...
+    LLMResponse(BaseModel):  # Response model for LLM...
+    LLMInterface: __init__(3),chat(1),_openai_chat(1),simple_chat(2),close(0)  # Interface for interacting with LLM providers...
+  project.sh:
+  src/prollama/__init__.py:
+  src/prollama/__main__.py:
+  src/prollama/models.py:
+    e: TaskComplexity,TaskType,TaskStatus,PrivacyLevel,ModelTier,AnonymizationMapping,AnonymizationResult,Task,TaskResult,ProxyRequest
+    TaskComplexity(str,Enum):
+    TaskType(str,Enum):
+    TaskStatus(str,Enum):
+    PrivacyLevel(str,Enum):
+    ModelTier(str,Enum):
+    AnonymizationMapping(BaseModel):  # Tracks original ↔ anonymized token pairs for rehydration...
+    AnonymizationResult(BaseModel):  # Output of the anonymization pipeline...
+    Task(BaseModel):  # A unit of work submitted to the executor...
+    TaskResult(BaseModel):  # Result of a completed (or failed) task...
+    ProxyRequest(BaseModel):  # Incoming chat completion request (OpenAI-compatible subset)...
+  src/prollama/anonymizer/__init__.py:
+  src/prollama/executor/__init__.py:
+  src/prollama/router/__init__.py:

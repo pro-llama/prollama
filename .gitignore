@@ -1,17 +1,44 @@
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/prollama.iml
-.idea/vcs.xml
+# Python
+.env.local
+.env.example
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
 *.egg-info/
+*.egg
 dist/
 build/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+.eggs/
+
+# Virtual environments
 .venv/
-.devloop/
-devloop.yaml
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Lint
+.ruff_cache/
+
+# prollama runtime
+.prollama/
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# Environment variables
+.env
