@@ -82,6 +82,39 @@ def logout() -> None:
     logout()
 
 
+# ── ticket ─────────────────────────────────────────────────────────────────
+
+@main.command()
+@click.argument("title")
+@click.option("--description", "-d", default=None, help="Issue description")
+@click.option("--type", "-t", "task_type", default="fix", help="Task type (fix, feature, refactor)")
+@click.option("--label", "-l", multiple=True, help="Additional labels")
+@click.pass_context
+def ticket(ctx: click.Context, title: str, description: str | None, task_type: str, label: tuple) -> None:
+    """Create GitHub issue via planfile integration."""
+    from prollama.integrations.planfile import create_prollama_ticket, is_planfile_available
+    
+    if not is_planfile_available():
+        console.print("[red]✗[/red] planfile not installed.")
+        console.print("  Install: pip install /home/tom/github/semcod/planfile")
+        ctx.exit(1)
+    
+    labels = list(label) if label else []
+    result = create_prollama_ticket(
+        title=title,
+        description=description,
+        task_type=task_type,
+        repo=None,  # auto-detect
+        token=None,  # load from credentials
+    )
+    
+    if result:
+        console.print(f"[green]✓[/green] Created issue #{result['id']}")
+        console.print(f"  {result['url']}")
+    else:
+        ctx.exit(1)
+
+
 # ── init ───────────────────────────────────────────────────────────────────
 
 @main.command()
@@ -186,6 +219,7 @@ def status(ctx: click.Context) -> None:
 @click.option("--dry-run", is_flag=True, help="Show what would happen without executing")
 @click.option("--pr", is_flag=True, help="Create Pull Request with the fix")
 @click.option("--draft-pr", is_flag=True, help="Create PR as draft")
+@click.option("--create-issue", is_flag=True, help="Create GitHub issue for this task")
 @click.pass_context
 def solve(
     ctx: click.Context,
@@ -196,6 +230,7 @@ def solve(
     dry_run: bool,
     pr: bool,
     draft_pr: bool,
+    create_issue: bool,
 ) -> None:
     """Solve a coding task using LLM orchestration."""
     from prollama.executor import TaskExecutor
@@ -256,6 +291,31 @@ def solve(
                 console.print(f"\n[green]✓[/green] Pull Request created!")
                 console.print(f"  [cyan]#{pr_data['number']}[/cyan] {pr_data['title']}")
                 console.print(f"  {pr_data['html_url']}")
+        
+        # Create GitHub issue if requested
+        if create_issue:
+            from prollama.integrations.planfile import create_prollama_ticket
+            
+            # Build issue description with patch
+            issue_body = f"**Task:** {description}\n"
+            if file_path:
+                issue_body += f"**File:** {file_path}\n"
+            if error:
+                issue_body += f"**Error:**\n```\n{error}\n```\n"
+            issue_body += f"\n**Solution:**\n```diff\n{result.patch}\n```\n"
+            
+            ticket_result = create_prollama_ticket(
+                title=description,
+                description=issue_body,
+                task_type=task.task_type.value,
+                model_used=result.model_used,
+                cost=result.cost_usd
+            )
+            
+            if ticket_result:
+                console.print(f"\n[green]✓[/green] GitHub issue created!")
+                console.print(f"  [cyan]#{ticket_result['id']}[/cyan] {description}")
+                console.print(f"  {ticket_result['url']}")
     else:
         console.print(f"[red]✗[/] Failed: {result.error_message}")
         console.print(f"  Iterations: {result.iterations}  Cost: ${result.cost_usd:.4f}")
@@ -267,37 +327,87 @@ def solve(
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--level", "-l", default=None, type=click.Choice(["none", "basic", "full"]))
 @click.option("--output", "-o", default=None, help="Output file (default: stdout)")
+@click.option("--filter-secrets", is_flag=True, help="Enable Tabnine Shield-like secret filtering")
 @click.pass_context
-def anonymize(ctx: click.Context, file_path: str, level: str | None, output: str | None) -> None:
+def anonymize(ctx: click.Context, file_path: str, level: str | None, output: str | None, filter_secrets: bool) -> None:
     """Anonymize a source file and show results."""
     from prollama.anonymizer import AnonymizationPipeline
     from prollama.models import PrivacyLevel
+    from rich.console import Console
+    from rich.panel import Panel
 
     config = _load_config(ctx)
     privacy_level = PrivacyLevel(level) if level else PrivacyLevel(config.privacy.level)
+    console = Console()
 
     code = Path(file_path).read_text()
-    pipeline = AnonymizationPipeline(privacy_level=privacy_level)
-    result = pipeline.run(code)
+    
+    if filter_secrets:
+        # Use enhanced anonymizer with secret filtering
+        from prollama.anonymizer.enhanced_layer import EnhancedAnonymizer
+        
+        try:
+            anonymizer = EnhancedAnonymizer()
+            anonymized_code, mappings = anonymizer.anonymize(code, filter_secrets=True)
+            
+            # Print security report
+            anonymizer.print_security_report()
+            
+            if output:
+                Path(output).write_text(anonymized_code)
+                console.print(f"\n[green]✓[/] Written to {output}")
+            else:
+                console.print(Panel(anonymized_code, title="Anonymized with Secret Filtering", border_style="red"))
+                
+        except Exception as e:
+            console.print(f"[red]❌ Enhanced filtering failed: {e}[/]")
+            console.print("[yellow]Falling back to basic anonymization...[/]")
+            
+            # Fallback to basic pipeline
+            pipeline = AnonymizationPipeline(privacy_level=privacy_level)
+            result = pipeline.run(code)
+            
+            if result.stats:
+                console.print("[bold]Anonymization report:[/]")
+                for category, count in sorted(result.stats.items()):
+                    console.print(f"  {category}: [cyan]{count}[/] item(s) found & replaced")
+                console.print()
 
-    if result.stats:
-        console.print("[bold]Anonymization report:[/]")
-        for category, count in sorted(result.stats.items()):
-            console.print(f"  {category}: [cyan]{count}[/] item(s) found & replaced")
-        console.print()
+            if output:
+                Path(output).write_text(result.anonymized_code)
+                console.print(f"[green]✓[/] Written to {output}")
+            else:
+                console.print(Panel(result.anonymized_code, title="Anonymized", border_style="blue"))
 
-    if output:
-        Path(output).write_text(result.anonymized_code)
-        console.print(f"[green]✓[/] Written to {output}")
+            if result.mappings:
+                console.print("\n[bold]Mappings (for rehydration):[/]")
+                for m in result.mappings[:20]:
+                    console.print(f"  {m.replacement} ← [dim]{m.original[:40]}{'…' if len(m.original) > 40 else ''}[/]")
+                if len(result.mappings) > 20:
+                    console.print(f"  [dim]... and {len(result.mappings) - 20} more[/]")
     else:
-        console.print(Panel(result.anonymized_code, title="Anonymized", border_style="blue"))
+        # Use basic anonymization pipeline
+        pipeline = AnonymizationPipeline(privacy_level=privacy_level)
+        result = pipeline.run(code)
 
-    if result.mappings:
-        console.print("\n[bold]Mappings (for rehydration):[/]")
-        for m in result.mappings[:20]:
-            console.print(f"  {m.replacement} ← [dim]{m.original[:40]}{'…' if len(m.original) > 40 else ''}[/]")
-        if len(result.mappings) > 20:
-            console.print(f"  [dim]... and {len(result.mappings) - 20} more[/]")
+        if result.stats:
+            console.print("[bold]Anonymization report:[/]")
+            for category, count in sorted(result.stats.items()):
+                console.print(f"  {category}: [cyan]{count}[/] item(s) found & replaced")
+            console.print()
+
+        if output:
+            Path(output).write_text(result.anonymized_code)
+            console.print(f"[green]✓[/] Written to {output}")
+        else:
+            console.print(Panel(result.anonymized_code, title="Anonymized", border_style="blue"))
+
+        if result.mappings:
+            console.print("\n[bold]Mappings (for rehydration):[/]")
+            for m in result.mappings[:20]:
+                console.print(f"  {m.replacement} ← [dim]{m.original[:40]}{'…' if len(m.original) > 40 else ''}[/]")
+            if len(result.mappings) > 20:
+                console.print(f"  [dim]... and {len(result.mappings) - 20} more[/]")
 
 
 # ── config ─────────────────────────────────────────────────────────────────

@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.7] - 2026-04-02
+
+### Docs
+- Update E2E_TEST_REPORT.md
+- Update README.md
+- Update README_SECURE_TOKENS.md
+- Update docs/README.md
+
+### Test
+- Update test_advanced_filtering_safe.py
+- Update test_comparison_safe.py
+- Update test_real_projects.py
+- Update test_secrets_sample_safe.py
+
+### Other
+- Update .gitignore
+- Update PKG-INFO
+- Update examples/workflow/auto_detection.sh
+- Update examples/workflow/autodetection_demo.sh
+- Update examples/workflow/autodetection_output.txt
+
 ## [0.2.6] - 2026-04-02
 
 ### Docs

@@ -1,0 +1,43 @@
+======================================
+PROLLAMA AUTODETEKCJA - KROK PO KROKU
+======================================
+
+Użytkownik: Tom Softreck (tom@sapletta.dev)
+Data: Thu Apr  2 14:31:57 CEST 2026
+
+[KROK 1] Sprawdzenie danych z .git
+--------------------------------------
+Tom Softreck
+tom@sapletta.dev
+git@github.com:pro-llama/prollama.git
+
+[KROK 2] Sprawdzenie aktualnego branchu
+--------------------------------------
+main
+
+[KROK 3] Autodetekcja repo przez prollama
+--------------------------------------
+Wykryte: pro-llama/prollama
+Branch: main
+
+[KROK 4] Symulacja prollama login
+--------------------------------------
+Token zapisany: /home/tom/.prollama/credentials.json
+Username: tomsyrotniak
+Logged in: True
+
+[KROK 5] Sprawdzenie uprawnień pliku
+--------------------------------------
+-rw------- 1 tom tom 79 Apr  2 14:31 /home/tom/.prollama/credentials.json
+
+[KROK 6] Wylogowanie
+--------------------------------------
+✓ Logged out. GitHub credentials removed.
+
+[KROK 7] Weryfikacja usunięcia
+--------------------------------------
+Token usunięty: True
+
+======================================
+AUTODETEKCJA DZIAŁA!
+======================================

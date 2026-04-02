@@ -7,7 +7,7 @@ Project-URL: Repository, https://github.com/softreck/prollama
 Project-URL: Documentation, https://docs.prollama.dev
 Project-URL: Changelog, https://github.com/softreck/prollama/blob/main/CHANGELOG.md
 Project-URL: Issues, https://github.com/softreck/prollama/issues
-Author-email: Tom Sapletta <tom@sapletta.com>
+Author-email: Tom Sapletta <tom@sapletta.dev>
 License-Expression: Apache-2.0
 License-File: LICENSE
 Keywords: ai,anonymization,code-privacy,coding,llm,proxy,pyqual

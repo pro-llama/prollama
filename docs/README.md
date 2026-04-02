@@ -264,7 +264,7 @@ prollama/
 ## Contributing
 
 **Contributors:**
-- Tom Softreck <tom@sapletta.com>
+- Tom Softreck <tom@sapletta.dev>
 - Tom Sapletta <tom-sapletta-com@users.noreply.github.com>
 
 We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.

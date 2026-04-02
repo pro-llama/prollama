@@ -4,12 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "prollama"
-version = "0.2.6"
+version = "0.2.7"
 description = "Intelligent LLM Execution Layer for developer teams — anonymize code, route models, solve tickets."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [
+    {name = "Tom Sapletta", email = "tom@sapletta.dev"},
     {name = "Tom Sapletta", email = "tom@sapletta.com"},
 ]
 keywords = ["llm", "proxy", "code-privacy", "ai", "coding", "anonymization", "pyqual"]
